@@ -1,13 +1,13 @@
 'use client';
 
 import React from 'react';
-import { CheckCircle2, Circle, Sparkles, TrendingUp, User, Map, CheckSquare, FileText, Code, Database, Monitor, FolderKanban, Layers, Rocket, Clock } from 'lucide-react';
+import { CheckCircle2, Circle, Sparkles, TrendingUp, User, Map, CheckSquare, FileText, Code, Database, Monitor, FolderKanban, Layers, Rocket, Clock, Linkedin, Github, Cpu, Zap, Target, ArrowRight } from 'lucide-react';
 
 const CareerLanding = () => {
   const progressData = [
     { label: "Frontend Basics", progress: 100, status: "completed" },
-    { label: "Backend Development", progress: 85, status: "in-progress" },
-    { label: "Database & APIs", progress: 45, status: "in-progress" },
+    { label: "Backend Development", progress: 80, status: "in-progress" },
+    { label: "Database & APIs", progress: 40, status: "in-progress" },
     { label: "DevOps & Deployment", progress: 0, status: "locked" },
   ];
 
@@ -54,7 +54,7 @@ const CareerLanding = () => {
         
         {/* Left Content Section */}
         <div className="space-y-8">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1a1a20] border border-gray-800 text-xs font-medium text-gray-400">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1a1a20] border border-gray-800 text-xs text-gray-400">
             <Sparkles size={14} className="text-cyan-400" />
             AI-Powered Career Intelligence
           </div>
@@ -96,7 +96,7 @@ const CareerLanding = () => {
                 <h3 className="text-2xl mb-1">Full-Stack Developer Path</h3>
                 <p className="text-gray-500 text-sm">Current: Building REST APIs</p>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-400 text-sm font-medium">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-400 text-sm ">
                 <TrendingUp size={16} />
                 12 day streak
               </div>
@@ -105,7 +105,7 @@ const CareerLanding = () => {
             {/* Overall Progress */}
             <div className="mb-10">
               <div className="flex justify-between text-sm mb-3">
-                <span className="text-gray-400 font-medium">Overall Progress</span>
+                <span className="text-gray-400 ">Overall Progress</span>
                 <span className="text-indigo-300 text-lg">67%</span>
               </div>
               <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
@@ -132,7 +132,7 @@ const CareerLanding = () => {
                     )}
                     <div className="w-full">
                       <div className="flex justify-between items-center mb-2">
-                        <span className={`text-sm font-medium ${step.status === 'locked' ? 'text-gray-500' : 'text-gray-200'}`}>
+                        <span className={`text-sm ${step.status === 'locked' ? 'text-gray-500' : 'text-gray-200'}`}>
                           {step.label}
                         </span>
                         <span className="text-xs text-gray-500">{step.progress}%</span>
@@ -158,6 +158,12 @@ const CareerLanding = () => {
 
       {/* Roadmap Section */}
       <RoadmapPreview />
+
+      {/* How It Works Section */}
+      <HowItWorks />
+
+      {/* Final CTA Section */}
+      <FinalCTA />
     </>
   );
 };
@@ -191,7 +197,7 @@ const FeaturesSection = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
         <div className="text-center mb-16 space-y-4">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
+          <h2 className="text-4xl md:text-5xl tracking-tight">
             Why <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#837FA4] via-[#7EA9AC] to-[#C390D4]">SKILLANEOUS</span>
           </h2>
           <p className="text-gray-500 text-lg">
@@ -219,7 +225,7 @@ const FeaturesSection = () => {
                 </div>
 
                 {/* Text Content */}
-                <h3 className="text-xl font-bold mb-4 leading-snug">
+                <h3 className="text-xl mb-4 leading-snug">
                   {feature.title}
                 </h3>
                 <p className="text-gray-500 leading-relaxed text-[15px]">
@@ -298,152 +304,303 @@ const RoadmapPreview = () => {
     },
   ];
 
+  const RADIUS = 250;
+  const CENTER = 400; // Relative to SVG viewBox
+
+  // Function to calculate SVG coordinates for arcs
+  const getPoint = (index: number) => {
+    const angle = (index * 60 - 90) * (Math.PI / 180);
+    return {
+      x: CENTER + RADIUS * Math.cos(angle),
+      y: CENTER + RADIUS * Math.sin(angle)
+    };
+  };
   return (
-    <section className="relative min-h-screen bg-[#0a0a0c] py-24 px-6 overflow-hidden font-sans">
-      {/* Background Radial Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[600px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
+    <section className="relative bg-[#0a0a0c] py-24 px-6 overflow-hidden min-h-screen font-sans">
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-indigo-500/5 blur-[120px] rounded-full pointer-events-none" />
 
-      <div className="relative max-w-7xl mx-auto">
-        {/* Header Section */}
+      <div className="relative max-w-7xl mx-auto z-10">
         <div className="text-center mb-20">
-          <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
-            Your Personalized <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-300">Roadmap</span>
+          <h2 className="text-4xl md:text-5xl  text-white mb-4">
+            Your Personalized <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">Roadmap</span>
           </h2>
-          <p className="text-gray-500 text-lg max-w-2xl mx-auto mb-8">
-            AI-generated learning path tailored to your goals and experience level
-          </p>
-
-          {/* Duration Badge */}
-          <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-md">
-            <Clock className="w-5 h-5 text-cyan-400" />
-            <span className="text-gray-400 text-sm">Total Duration:</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 font-bold">
-              35-46 weeks
-            </span>
-          </div>
-        </div>
-
-        {/* Roadmap Visualization */}
-        <div className="relative flex items-center justify-center min-h-[800px] mb-20">
-          
-          {/* Central Core Hub */}
-          <div className="absolute z-20 w-56 h-56 rounded-full bg-[#111116] border border-white/10 flex flex-col items-center justify-center text-center p-6 shadow-[0_0_60px_rgba(168,85,247,0.15)] ring-1 ring-white/5">
-            <h3 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 font-bold text-lg mb-1">
-              AI-Powered
-            </h3>
-            <p className="text-white font-bold text-xl leading-tight">Learning Path</p>
-            <p className="text-gray-500 text-xs mt-2 uppercase tracking-widest font-semibold">35-46 weeks</p>
-          </div>
-
-          {/* SVG Connection Paths (Desktop Only) */}
-          <div className="absolute inset-0 hidden lg:block pointer-events-none">
-            <svg className="w-full h-full" viewBox="0 0 800 800">
-              <circle cx="400" cy="400" r="280" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="2" strokeDasharray="10 10" />
-            </svg>
-          </div>
-
-          {/* Cards Container - Grid on Mobile, Circular on Desktop */}
-          <div className="relative w-full min-h-[800px]">
-            {/* Mobile/Tablet Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:hidden">
-              {phases.map((phase, index) => {
-                const Icon = phase.icon;
-                return (
-                  <div key={index} className="group transition-all duration-500">
-                    <div className={`relative w-full p-6 rounded-[28px] bg-[#111116]/80 backdrop-blur-xl border ${phase.border} hover:bg-[#16161d] transition-all duration-300 hover:-translate-y-2`}>
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400 ${
-                          phase.text === 'text-cyan-400' ? 'group-hover:text-cyan-400' :
-                          phase.text === 'text-purple-400' ? 'group-hover:text-purple-400' :
-                          'group-hover:text-pink-400'
-                        }`}>
-                          {phase.number}
-                        </div>
-                        <Icon className={`w-6 h-6 ${phase.text} opacity-80 group-hover:opacity-100`} />
-                      </div>
-                      <h4 className="text-white font-bold text-lg mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400">
-                        {phase.title}
-                      </h4>
-                      <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                        {phase.description}
-                      </p>
-                      <div className="flex items-center gap-2 pt-4 border-t border-white/5 text-[11px] uppercase tracking-widest font-bold text-gray-400">
-                        <Clock className={`w-3.5 h-3.5 ${phase.text}`} />
-                        {phase.duration}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Desktop Circular Layout */}
-            <div className="hidden lg:block absolute inset-0">
-              {phases.map((phase, index) => {
-                // Mathematical positioning for the circle layout on large screens
-                const angle = (index * 60 - 90) * (Math.PI / 180);
-                const radius = 320; 
-                const x = Math.cos(angle) * radius;
-                const y = Math.sin(angle) * radius;
-
-                const Icon = phase.icon;
-
-                return (
-                  <div
-                    key={index}
-                    className="group transition-all duration-500 absolute"
-                    style={{
-                      top: '50%',
-                      left: '50%',
-                      transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
-                    }}
-                  >
-                    <div className={`relative w-full lg:w-64 p-6 rounded-[28px] bg-[#111116]/80 backdrop-blur-xl border ${phase.border} hover:bg-[#16161d] transition-all duration-300 hover:-translate-y-2`}>
-                      
-                      {/* Header: Number and Icon */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div className={`w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-bold text-gray-400 ${
-                          phase.text === 'text-cyan-400' ? 'group-hover:text-cyan-400' :
-                          phase.text === 'text-purple-400' ? 'group-hover:text-purple-400' :
-                          'group-hover:text-pink-400'
-                        }`}>
-                          {phase.number}
-                        </div>
-                        <Icon className={`w-6 h-6 ${phase.text} opacity-80 group-hover:opacity-100`} />
-                      </div>
-
-                      {/* Content */}
-                      <h4 className="text-white font-bold text-lg mb-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400">
-                        {phase.title}
-                      </h4>
-                      <p className="text-gray-500 text-sm leading-relaxed mb-6">
-                        {phase.description}
-                      </p>
-
-                      {/* Footer duration */}
-                      <div className="flex items-center gap-2 pt-4 border-t border-white/5 text-[11px] uppercase tracking-widest font-bold text-gray-400">
-                        <Clock className={`w-3.5 h-3.5 ${phase.text}`} />
-                        {phase.duration}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+          <div className="flex justify-center mt-6">
+            <div className="inline-flex items-center gap-3 px-6 py-2.5 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10">
+              <Clock className="w-5 h-5 text-cyan-400" />
+              <span className="text-xl  text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-pink-400">35-46 weeks</span>
             </div>
           </div>
         </div>
 
-        {/* Footer CTA */}
-        <div className="text-center space-y-8 pb-12">
-          <p className="text-gray-500 text-sm italic">
-            This is a <span className="text-orange-300/60">sample roadmap</span>. Your personalized path will be custom-tailored to your experience and goals.
-          </p>
-          
-          <button className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 transition-all hover:scale-105 active:scale-95 shadow-[0_0_40px_rgba(168,85,247,0.2)]">
-            <div className="bg-[#0a0a0c] text-white px-10 py-4 rounded-[14px] font-bold text-xs tracking-widest uppercase transition-all group-hover:bg-transparent">
+        <div className="relative flex items-center justify-center min-h-[800px]">
+          {/* SVG Connector Arcs */}
+          <svg 
+            className="absolute inset-0 w-full h-full hidden lg:block pointer-events-none" 
+            viewBox="0 0 800 800"
+            style={{ zIndex: 0 }}
+          >
+            {phases.map((_, i) => {
+              if (i === phases.length - 1) return null; // Don't connect 6 back to 1
+              
+              const start = getPoint(i);
+              const end = getPoint(i + 1);
+              
+              // SVG Arc Path: A rx ry x-axis-rotation large-arc-flag sweep-flag x y
+              const d = `M ${start.x} ${start.y} A ${RADIUS} ${RADIUS} 0 0 1 ${end.x} ${end.y}`;
+              
+              return (
+                <path
+                  key={`arc-${i}`}
+                  d={d}
+                  fill="none"
+                  stroke="rgba(255,255,255,0.7)"
+                  strokeWidth="2"
+                  strokeDasharray="8 8"
+                />
+              );
+            })}
+          </svg>
+
+          {/* Central Hub */}
+          <div className="relative z-30 w-60 h-60 rounded-full bg-[#111116] border border-white/10 flex flex-col items-center justify-center text-center p-6 shadow-[0_0_50px_rgba(168,85,247,0.1)] ring-1 ring-white/5">
+            <h3 className="text-xl text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400 mb-1">AI-Powered</h3>
+            <p className="text-lg text-white">Learning Path</p>
+            <div className="text-sm text-gray-500 mt-1">35-46 weeks</div>
+          </div>
+
+          {/* Orbiting Cards (Desktop) */}
+          <div className="absolute inset-0 hidden lg:block">
+            {phases.map((phase, index) => {
+              const point = getPoint(index);
+              const IconComponent = phase.icon;
+
+              return (
+                <div
+                  key={index}
+                  className="absolute transition-all duration-500 hover:scale-105"
+                  style={{
+                    top: `${(point.y / 800) * 100}%`,
+                    left: `${(point.x / 800) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 20
+                  }}
+                >
+                  <div className={`w-64 p-6 rounded-[28px] bg-[#111116]/95 backdrop-blur-xl border ${phase.border} shadow-2xl group`}>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="w-9 h-9 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs  text-gray-400 group-hover:text-white transition-colors">
+                        {phase.number}
+                      </div>
+                      <IconComponent className={`w-6 h-6 ${phase.text}`} />
+                    </div>
+                    <h3 className="text-white  text-lg mb-2">{phase.title}</h3>
+                    <p className="text-gray-400 text-xs leading-relaxed mb-4">{phase.description}</p>
+                    <div className="pt-4 border-t border-white/5 flex items-center gap-2">
+                      <Clock className={`w-3 h-3 ${phase.text}`} />
+                      <span className="text-[10px] uppercase tracking-widest  text-gray-500">{phase.duration}</span>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Mobile View */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:hidden w-full relative z-20">
+            {phases.map((phase, index) => {
+              const IconComponent = phase.icon;
+              return (
+                <div key={index} className={`p-6 rounded-[28px] bg-[#111116] border ${phase.border}`}>
+                  <div className="flex justify-between mb-4">
+                    <span className="text-gray-500 ">{phase.number}</span>
+                    <IconComponent className={`w-6 h-6 ${phase.text}`} />
+                  </div>
+                  <h3 className="text-white  text-lg">{phase.title}</h3>
+                  <p className="text-gray-500 text-sm">{phase.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-20 text-center">
+          <button className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 hover:scale-105 transition-all">
+            <div className="bg-[#0a0a0c] text-white px-10 py-4 rounded-[14px]  text-xs tracking-widest uppercase transition-all duration-500 ease-in-out group-hover:bg-transparent">
               Generate My Custom Roadmap
             </div>
           </button>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const HowItWorks = () => {
+  const steps = [
+    {
+      number: "01",
+      title: "Upload Your Profile",
+      description: "Add your resume, CV, or connect your LinkedIn profile",
+      color: "from-cyan-500/20 to-cyan-500/5",
+      borderColor: "border-cyan-500/20",
+      hoverBorder: "hover:border-cyan-400/50",
+      glowColor: "group-hover:shadow-cyan-500/20",
+      icons: [Linkedin, FileText, Github]
+    },
+    {
+      number: "02",
+      title: "AI Analyzes Your Path",
+      description: "Our AI identifies skills gaps and projects that accelerate your growth",
+      color: "from-purple-500/20 to-purple-500/5",
+      borderColor: "border-purple-500/20",
+      hoverBorder: "hover:border-purple-400/50",
+      glowColor: "group-hover:shadow-purple-500/20",
+      icons: [Sparkles, Cpu, Zap]
+    },
+    {
+      number: "03",
+      title: "Get Your Roadmap",
+      description: "Receive personalized project suggestions and a custom learning roadmap",
+      color: "from-pink-500/20 to-pink-500/5",
+      borderColor: "border-pink-500/20",
+      hoverBorder: "hover:border-pink-400/50",
+      glowColor: "group-hover:shadow-pink-500/20",
+      icons: [Target, Map, Rocket]
+    }
+  ];
+
+  return (
+    <section className="bg-[#0a0a0c] py-24 px-6 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-5xl  text-white tracking-tight">
+            How <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-300 via-purple-400 to-pink-400">It Works</span>
+          </h2>
+          <p className="text-gray-500 text-lg">
+            Three simple steps to transform your career trajectory
+          </p>
+        </div>
+
+        {/* Steps Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {steps.map((step, idx) => {
+            const Icon0 = step.icons[0];
+            const Icon1 = step.icons[1];
+            const Icon2 = step.icons[2];
+            
+            return (
+              <div 
+                key={idx}
+                className={`group relative p-10 rounded-[30px] bg-gradient-to-br ${step.color} border ${step.borderColor} ${step.hoverBorder} transition-all duration-500 hover:scale-[1.03] hover:shadow-[0_20px_20px_rgba(180,202,237,0.2)] ${step.glowColor} flex flex-col items-center text-center overflow-hidden`}
+              >
+                {/* Floating Background Icons */}
+                <div className="absolute top-6 left-6 opacity-40 group-hover:opacity-100 group-hover:rotate-[+7deg] group-hover:scale-110 transition-all duration-500 ease-in-out ">
+                  <Icon0 size={32} className="text-gray-200 border border-gray-200/40 rounded-lg p-1" />
+                </div>
+                <div className="absolute top-6 right-6 opacity-40 group-hover:opacity-100 group-hover:rotate-[+7deg] group-hover:scale-110 transition-all duration-500 ease-in-out ">
+                  <Icon1 size={32} className="text-gray-200 border border-gray-200/40 rounded-lg p-1" />
+                </div>
+                <div className="absolute bottom-6 left-6 opacity-40 group-hover:opacity-100 group-hover:rotate-[+7deg] group-hover:scale-110 transition-all duration-500 ease-in-out">
+                  <Icon2 size={32} className="text-gray-200 border border-gray-200/40 rounded-lg p-1" />
+                </div>
+                
+
+                {/* Central Plate with Number */}
+                <div className="relative mb-8 transition-all duration-500 group-hover:scale-125 group-hover:rotate-[+7deg]">
+                  {/* The "Plate" background */}
+                  <div className="w-32 h-32 rounded-[32px] bg-white/5 border border-white/10 backdrop-blur-3xl flex items-center justify-center shadow-outer shadow-gray-100/30">
+                    <span className="text-6xl  text-gray-400/10 group-hover:text-gray-100/15 transition-colors duration-300 tracking-tighter select-none">
+                      {step.number}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Text Content */}
+                <div className="space-y-4 relative z-10">
+                  <h3 className={`text-2xl  transition-colors duration-300 ${idx === 1 ? 'text-purple-300' : 'text-white'}`}>
+                    {step.title}
+                  </h3>
+                  <p className="text-gray-500 leading-relaxed text-sm max-w-[240px] mx-auto">
+                    {step.description}
+                  </p>
+                </div>
+
+                {/* Bottom accent glow on hover */}
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const FinalCTA = () => {
+  return (
+    <section className="bg-[#0a0a0c] py-24 px-6 relative overflow-hidden">
+      {/* Background Decorative Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto relative">
+        {/* Main Card Container */}
+        <div className="bg-gradient-to-br from-white/10 to-white/5 border border-white/5 rounded-[40px] p-12 md:p-20 text-center relative overflow-hidden shadow-2xl">
+          
+          {/* Floating Corner Icons */}
+          <div className="absolute top-8 right-8 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-purple-400/50 group hover:text-purple-400 transition-colors">
+            <Sparkles size={24} />
+          </div>
+          <div className="absolute bottom-8 left-8 w-12 h-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-cyan-400/50 group hover:text-cyan-400 transition-colors">
+            <Zap size={24} />
+          </div>
+
+          {/* Header Text */}
+          <h2 className="text-4xl md:text-6xl  text-white mb-6 leading-tight">
+            Ready to Transform <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">Your</span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">Career?</span>
+          </h2>
+          
+          <p className="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-12 leading-relaxed">
+            Join other learners who are already building their future with AI-powered roadmaps. Start your journey today absolutely free.
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
+            {/* Primary CTA with Gradient Border Wrapper */}
+            {/* Added 'group' to the wrapper so the child button can react to its hover state */}
+            <div className="group p-[1px] rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 w-full sm:w-auto hover:scale-105 transition-all duration-500 ease-in-out shadow-[0_0_20px_rgba(168,85,247,0)] hover:shadow-[0_0_30px_rgba(168,85,247,0.3)]">
+              
+              <button className="bg-[#0a0a0c] group-hover:bg-transparent text-white px-10 py-4 rounded-[15px]  flex items-center justify-center gap-3 w-full transition-all duration-300 ease-in-out bg-clip-padding">
+                <span className="uppercase tracking-widest text-sm">Start Free Now</span>
+                <ArrowRight 
+                  size={18} 
+                  className="group-hover:translate-x-1 transition-transform duration-300" 
+                />
+              </button>
+              
+            </div>
+
+            {/* Secondary CTA */}
+            <button className="px-10 py-4 rounded-2xl border border-white/10 bg-white/5 text-white  uppercase tracking-widest text-sm hover:bg-white/10 transition-all w-full sm:w-auto">
+              See How It Works
+            </button>
+          </div>
+
+          {/* Trust Badges / Features */}
+          <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-cyan-400" />
+              <span className="text-xs  text-gray-500 uppercase tracking-tighter">No Credit Card Required</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-purple-500" />
+              <span className="text-xs  text-gray-500 uppercase tracking-tighter">Setup in 2 Minutes</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 rounded-full bg-pink-500" />
+              <span className="text-xs  text-gray-500 uppercase tracking-tighter">Cancel Anytime</span>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
