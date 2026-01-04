@@ -50,7 +50,7 @@ const CareerLanding = () => {
         />
       </div>
       
-      <div className="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div className="max-w-6xl w-full gap-12 items-center relative z-10">
         
         {/* Left Content Section */}
         <div className="space-y-8">
@@ -60,11 +60,11 @@ const CareerLanding = () => {
           </div>
           
           <h1 className="text-5xl md:text-7xl leading-tight tracking-tight">
-            Your Skills. <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">Your</span> <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">Path.</span> Your Career Now <span className="text-gray-200">Automated.</span>
+            Your Skills. <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-300">Your </span>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400">Path</span>. Your Career Now <span className="text-gray-200">Automated.</span>
           </h1>
           
-          <p className="text-gray-400 text-lg max-w-md leading-relaxed">
+          <p className="text-gray-400 text-lg max-w-m">
             AI that converts your goals into a personalized roadmap of skills, tasks, and projects.
           </p>
           
@@ -82,74 +82,7 @@ const CareerLanding = () => {
           </div>
         </div>
 
-        {/* Right Dashboard Card Section */}
-        <div className="relative group">
-          {/* Ambient Lighting Background */}
-          <div className="absolute inset-0 rounded-[32px] bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-70 transition-opacity duration-500 -z-10 scale-100" />
-          
-          {/* Glass Card */}
-          <div className="relative p-6 rounded-3xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-2xl border border-white/20 shadow-2xl hover:shadow-[0_0_40px_rgba(140,229,233,0.2)] transition-all duration-500">
-            
-            {/* Header */}
-            <div className="flex justify-between items-start mb-10">
-              <div>
-                <h3 className="text-2xl mb-1">Full-Stack Developer Path</h3>
-                <p className="text-gray-500 text-sm">Current: Building REST APIs</p>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-950/30 border border-cyan-500/30 text-cyan-400 text-sm ">
-                <TrendingUp size={16} />
-                12 day streak
-              </div>
-            </div>
-
-            {/* Overall Progress */}
-            <div className="mb-10">
-              <div className="flex justify-between text-sm mb-3">
-                <span className="text-gray-400 ">Overall Progress</span>
-                <span className="text-indigo-300 text-lg">67%</span>
-              </div>
-              <div className="h-2 w-full bg-gray-800 rounded-full overflow-hidden">
-                <div className="h-full w-[67%] bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400" />
-              </div>
-            </div>
-
-            {/* Roadmap Steps */}
-            <div className="space-y-4">
-              {progressData.map((step, idx) => (
-                <div 
-                  key={idx}
-                  className={`p-4 rounded-2xl border flex items-center justify-between transition-all ${
-                    step.status === 'completed' 
-                      ? 'bg-cyan-950/10 border-cyan-500/20' 
-                      : 'bg-white/5 border-white/10'
-                  }`}
-                >
-                  <div className="flex items-center gap-4 w-full">
-                    {step.status === 'completed' ? (
-                      <CheckCircle2 className="text-cyan-400 shrink-0" size={20} />
-                    ) : (
-                      <Circle className="text-gray-600 shrink-0" size={20} />
-                    )}
-                    <div className="w-full">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className={`text-sm ${step.status === 'locked' ? 'text-gray-500' : 'text-gray-200'}`}>
-                          {step.label}
-                        </span>
-                        <span className="text-xs text-gray-500">{step.progress}%</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-full bg-gradient-to-r from-cyan-400 to-pink-400 transition-all duration-1000`}
-                          style={{ width: `${step.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+        
       </div>
       </div>
 
