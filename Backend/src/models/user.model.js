@@ -1,4 +1,4 @@
-import mangoose, { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema({
     username: {
@@ -12,16 +12,16 @@ const userSchema = new Schema({
         required: true,
         unique: true,
         trim: true,
+        lowercase: true,
     },
     password: {
         type: String,
         required: true,
-        trim: true,
     },
     careerGoal: {
         type: String,
         required: true,
-        trim: true,
+        trim: false,
     },
 },{timestamps:true})
 
