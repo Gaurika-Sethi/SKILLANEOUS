@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .purple-accent { color: #8B5CF6; } /* matches text-violet-500 */
+        .section-divider { border-bottom: 2px solid #8B5CF6; margin-bottom: 1rem; }
+        .sub-divider { border-bottom: 1px solid #E2E8F0; margin: 1rem 0; }
+    </style>
+</head>
+<body class="bg-slate-50 py-12">
+
+    <div class="max-w-[850px] mx-auto bg-white p-16 shadow-lg min-h-[1100px] text-slate-800">
+        
+        <header class="text-center mb-10">
+            <h1 class="text-5xl font-bold tracking-tight mb-4 uppercase">{{personalInfo.full_name}}</h1>
+            <div class="flex flex-wrap justify-center items-center gap-2 text-sm text-slate-600 mb-2">
+                <span>{{personalInfo.location}}</span>
+                <span class="text-slate-300">•</span>
+                <span>{{personalInfo.phone}}</span>
+                <span class="text-slate-300">•</span>
+                <span class="purple-accent font-medium">{{personalInfo.email}}</span>
+            </div>
+            <div class="flex justify-center gap-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
+                <a href="#" class="underline decoration-slate-300">Linkedin</a>
+                <span>|</span>
+                <a href="#" class="underline decoration-slate-300">Github</a>
+                <span>|</span>
+                <span class="lowercase text-slate-400">www.reallygreatsite.com</span>
+            </div>
+            <div class="sub-divider mt-6"></div>
+        </header>
+
+        <section class="mb-10">
+            <h2 class="text-lg font-bold uppercase tracking-wider mb-3">Summary</h2>
+            <p class="text-sm leading-relaxed text-slate-700">
+                {{generatedContent}}
+            </p>
+            <div class="sub-divider"></div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Work Experience</h2>
+            {{#each experience}}
+            <div class="mb-8">
+                <div class="flex justify-between items-baseline mb-2">
+                    <h3 class="text-md font-bold text-slate-900">{{this.role}}, {{this.company}}</h3>
+                    <span class="text-sm font-semibold text-slate-500">{{this.start_date}} - {{this.end_date}}</span>
+                </div>
+                <ul class="list-disc ml-5 text-sm text-slate-700 space-y-2">
+                    {{#each this.description}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+            {{/each}}
+            <div class="sub-divider"></div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Education</h2>
+            <div class="flex justify-between items-baseline">
+                <h3 class="text-md font-bold text-slate-900">{{this.degree}}</h3>
+                <span class="text-sm font-semibold text-slate-500">{{this.graduation_year}}</span>
+            </div>
+            <p class="text-sm text-slate-600">{{this.institution}}</p>
+            <div class="sub-divider"></div>
+        </section>
+
+        <section class="mb-10">
+            <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Projects</h2>
+            {{#each projects}}
+            <div class="mb-6">
+                <div class="flex justify-between items-baseline mb-1">
+                    <h4 class="text-sm font-bold text-slate-900">
+                        {{this.title}} <span class="text-slate-400 font-normal">🔗</span>
+                    </h4>
+                    <span class="text-xs font-bold text-slate-500 uppercase italic">{{this.duration}}</span>
+                </div>
+                <p class="text-xs purple-accent font-medium mb-2 italic">
+                    {{this.tech_stack.join(' | ')}}
+                </p>
+                <p class="text-xs text-slate-700 leading-normal mb-1">
+                    {{this.description.[0]}}
+                </p>
+            </div>
+            {{/each}}
+            <div class="sub-divider"></div>
+        </section>
+
+        <section>
+            <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Achievements</h2>
+            <ul class="list-disc ml-5 text-sm text-slate-700 space-y-2">
+                {{#each achievements}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </section>
+
+    </div>
+</body>
+</html>
