@@ -7,13 +7,13 @@ const resumeDataSchema = new Schema({
         enum: ["form", "pdf", "docx"],
     },
     personalInfo: {
-        full_name: String,
+        fullName: String,
         email: String,
         phone: String,
         location: String,
 
         photoUrl: {
-            type: string,
+            type: String,
             default: "",
         },
 
@@ -41,11 +41,11 @@ const resumeDataSchema = new Schema({
                 type: String,
                 required: true,
             },
-            start_date: {
+            startDate: {
                 type: String,
                 required: true,
             },
-            end_date: {
+            endDate: {
                 type: String,
                 required: true,
             },
@@ -60,7 +60,7 @@ const resumeDataSchema = new Schema({
                 type: String,
                 required: true,
             },
-            tech_stack: {
+            techStack: {
                 type: [String],
                 default: [],
             },
@@ -87,14 +87,12 @@ const resumeDataSchema = new Schema({
             ],
         },
     ],
-    education: [
-        {
-            institution: String,
-            degree: String,
-            location: String,
-            graduation_year: String,
-        },
-    ],
+    education: {
+        institution: String,
+        degree: String,
+        location: String,
+        graduationYear: String,
+    },
 
     achievements: {
         type: [String],
