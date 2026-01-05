@@ -77,12 +77,13 @@ const CareerLanding = () => {
                 <span className="relative z-10">Generate My Roadmap</span>
               </div>
             </button>
-            <Link href="/How it works/page.tsx">
-              <button className="relative group px-8 py-4 rounded-xl border border-white/20 bg-[#14141a]/80 backdrop-blur-md hover:bg-[#1c1c24]/80 hover:backdrop-blur-lg hover:border-white/30 text-sm tracking-widest uppercase transition-all overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="relative z-10">Explore How It Works</span>
-              </button>
-            </Link>
+           <Link
+           href="/how-it-works"
+           className="relative group inline-flex items-center justify-center px-8 py-4 rounded-xl border border-white/20 bg-[#14141a]/80 backdrop-blur-md hover:bg-[#1c1c24]/80 hover:backdrop-blur-lg hover:border-white/30 text-sm tracking-widest uppercase transition-all overflow-hidden"
+           ><div className="absolute inset-0 bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+           <span className="relative z-10">Explore How It Works</span>
+           </Link>
+
           </div>
         </div>
 

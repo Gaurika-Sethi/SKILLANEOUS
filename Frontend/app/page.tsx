@@ -1,7 +1,5 @@
-import CareerLanding from './src/homepage';
-import WorkflowSection from './How it works/page';
+import CareerLanding from '@/src/homepage';
 
 export default function Home() {
   return <CareerLanding />;
-  return <WorkflowSection/>;
 }
