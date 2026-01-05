@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import WorkflowSection from './how_it_works';
+import Link from 'next/link';
 import { CheckCircle2, Circle, Sparkles, TrendingUp, User, Map, CheckSquare, FileText, Code, Database, Monitor, FolderKanban, Layers, Rocket, Clock, Linkedin, Github, Cpu, Zap, Target, ArrowRight } from 'lucide-react';
 
 const CareerLanding = () => {
@@ -75,10 +77,12 @@ const CareerLanding = () => {
                 <span className="relative z-10">Generate My Roadmap</span>
               </div>
             </button>
-            <button className="relative group px-8 py-4 rounded-xl border border-white/20 bg-[#14141a]/80 backdrop-blur-md hover:bg-[#1c1c24]/80 hover:backdrop-blur-lg hover:border-white/30 text-sm tracking-widest uppercase transition-all overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <span className="relative z-10">Explore How It Works</span>
-            </button>
+            <Link href="/How it works/page.tsx">
+              <button className="relative group px-8 py-4 rounded-xl border border-white/20 bg-[#14141a]/80 backdrop-blur-md hover:bg-[#1c1c24]/80 hover:backdrop-blur-lg hover:border-white/30 text-sm tracking-widest uppercase transition-all overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className="relative z-10">Explore How It Works</span>
+              </button>
+            </Link>
           </div>
         </div>
 
