@@ -31,7 +31,7 @@ const CareerLanding = () => {
           style={{
             animation: 'pulse-gradient-2 10s ease-in-out infinite',
             transform: 'translate(50%, -50%)',
-            animationDelay: '2s',
+            animationDelay: '0s',
           }}
         />
         <div 
@@ -39,7 +39,7 @@ const CareerLanding = () => {
           style={{
             animation: 'pulse-gradient-3 12s ease-in-out infinite',
             transform: 'translate(-50%, 50%)',
-            animationDelay: '4s',
+            animationDelay: '0s',
           }}
         />
         <div 
@@ -47,7 +47,7 @@ const CareerLanding = () => {
           style={{
             animation: 'pulse-gradient-4 9s ease-in-out infinite',
             transform: 'translate(30%, -50%)',
-            animationDelay: '1s',
+            animationDelay: '0s',
           }}
         />
       </div>
@@ -518,9 +518,10 @@ const FinalCTA = () => {
             </div>
 
             {/* Secondary CTA */}
-            <button className="px-10 py-4 rounded-2xl border border-white/10 bg-white/5 text-white  uppercase tracking-widest text-sm hover:bg-white/10 transition-all w-full sm:w-auto">
+            <Link href="/how-it-works"
+             className="px-10 py-4 rounded-2xl border border-white/10 bg-white/5 text-white  uppercase tracking-widest text-sm hover:bg-white/10 transition-all w-full sm:w-auto">
               See How It Works
-            </button>
+            </Link>
           </div>
 
           {/* Trust Badges / Features */}

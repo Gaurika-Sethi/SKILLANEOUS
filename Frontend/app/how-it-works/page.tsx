@@ -17,6 +17,7 @@ export default function HowItWorksPage() {
       description:
         "Add your resume, CV, or connect your LinkedIn profile to begin the process.",
       icon: Upload,
+      iconColor: "text-cyan-400",
       borderColor: "border-cyan-500/20",
       hoverBorder: "hover:border-cyan-500/50",
     },
@@ -26,6 +27,7 @@ export default function HowItWorksPage() {
       description:
         "Our AI identifies skills gaps and projects that accelerate your career growth.",
       icon: Cpu,
+      iconColor: "text-purple-400",
       borderColor: "border-purple-500/20",
       hoverBorder: "hover:border-purple-500/50",
     },
@@ -35,6 +37,7 @@ export default function HowItWorksPage() {
       description:
         "Receive personalized project suggestions and a custom learning roadmap.",
       icon: Map,
+      iconColor: "text-pink-400",
       borderColor: "border-pink-500/20",
       hoverBorder: "hover:border-pink-500/50",
     },
@@ -69,7 +72,7 @@ export default function HowItWorksPage() {
     <div className="bg-[#0a0a0c] font-sans">
       {/* SECTION 1: HOW IT WORKS */}
       <section className="py-24 px-6 relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-purple-600/5 blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] blur-[120px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-20 space-y-4">
@@ -85,7 +88,7 @@ export default function HowItWorksPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+          <div className={`grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10`}>
             {steps.map((step, idx) => {
               const Icon = step.icon;
               return (
@@ -93,11 +96,11 @@ export default function HowItWorksPage() {
                   key={idx}
                   className={`group relative p-10 rounded-[40px] bg-[#111116] border ${step.borderColor} ${step.hoverBorder} transition-all duration-500 hover:scale-[1.03] hover:shadow-2xl overflow-hidden`}
                 >
-                  <div className="absolute -top-4 -right-4 p-8 opacity-5 group-hover:opacity-20 transition-opacity">
+                  <div className={`absolute -top-4 -right-4 p-8 opacity-40 group-hover:opacity-90 transition-all ease-in-out ${step.iconColor}`}>
                     <Icon size={80} />
                   </div>
 
-                  <div className="relative mb-10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-[-6deg]">
+                  <div className="relative mb-10 transition-all duration-500 group-hover:scale-100 group-hover:rotate-[+7deg]">
                     <div className="w-20 h-20 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl flex items-center justify-center shadow-inner">
                       <span className="text-4xl font-black text-gray-700/80 group-hover:text-white transition-colors tracking-tighter">
                         {step.number}
@@ -112,14 +115,6 @@ export default function HowItWorksPage() {
                   <p className="text-gray-500 leading-relaxed mb-8">
                     {step.description}
                   </p>
-
-                  <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-gray-600 group-hover:text-white transition-colors">
-                    <span>Learn More</span>
-                    <ChevronRight
-                      size={14}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
-                  </div>
                 </div>
               );
             })}
@@ -128,13 +123,13 @@ export default function HowItWorksPage() {
       </section>
 
       {/* SECTION 2: WHY THIS WORKS */}
-      <section className="py-24 px-6 border-t border-white/5">
+      <section className="py-18 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row items-end justify-between mb-16 gap-6">
+          <div className="flex flex-col items-center text-center mb-16 gap-12">
             <div className="max-w-xl">
-              <h2 className="text-3xl font-bold text-white mb-4">
+              <h2 className="text-5xl font-bold text-white mb-4 ">
                 Why{" "}
-                <span className="italic font-serif text-purple-400">
+                <span className="text-purple-400">
                   This
                 </span>{" "}
                 Works
@@ -168,7 +163,7 @@ export default function HowItWorksPage() {
                     {feature.description}
                   </p>
 
-                  <div className="mt-8 h-1 w-0 bg-gradient-to-r from-cyan-500 to-purple-500 group-hover:w-full transition-all duration-700 ease-in-out rounded-full" />
+                  <div className="mt-8 h-1 w-0 bg-gradient-to-r from-cyan-500 via-purple-400 to-pink-500 group-hover:w-full transition-all duration-700 ease-in-out rounded-full" />
                 </div>
               );
             })}
