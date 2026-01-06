@@ -1,6 +1,6 @@
 'use client';
 import React, { useState } from 'react';
-import { Mail, Lock, Eye, EyeOff, ShieldCheck, Google } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ShieldCheck,} from 'lucide-react';
 
 const LoginPage = ({ onSkip, onLogin }) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -10,7 +10,7 @@ const LoginPage = ({ onSkip, onLogin }) => {
   return (
     <div className="min-h-screen bg-[#0a0a0c] flex flex-col items-center justify-center p-24 font-sans">
       {/* Main Login Card */}
-      <div className="w-full h-full max-w-[480px] bg-gradient-to-r from-white/10 via-white/5 to-white/1 rounded-[40px] p-10 md:p-14 shadow-[0_0_24px_rgba(138,216,237,0.2)] relative overflow-hidden">
+      <div className="w-full h-full max-w-[580px] bg-gradient-to-r from-white/10 via-white/5 to-white/1 rounded-[40px] p-10 md:p-14 shadow-[0_0_24px_rgba(138,216,237,0.2)] relative overflow-hidden">
         
         {/* Subtle Background Glow */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-32 blur-[80px] pointer-events-none" />
