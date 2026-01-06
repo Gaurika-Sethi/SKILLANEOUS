@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import LoginPage from "./login";
 
 export default function Navbar() {
   return (
