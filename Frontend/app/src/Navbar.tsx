@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-
+import LoginPage from "./login";
+import ThemeSelection from "./resume";
 export default function Navbar() {
   return (
     <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
