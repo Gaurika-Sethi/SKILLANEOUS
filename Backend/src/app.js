@@ -13,4 +13,9 @@ app.use(express.urlencoded({ extended: true, limit: "10kb" }));
 app.use(express.static("public"));
 app.use(cookieParser());
 
+// Routes would be added here
+import userRoutes from './routes/user.routes.js';
+
+app.use('/api/v1/users', userRoutes);
+
 export {app};
