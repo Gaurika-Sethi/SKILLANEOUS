@@ -20,19 +20,29 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
-    careerGoal: {
+
+    refreshToken: {
         type: String,
-        required: true,
-        trim: false,
     },
-},{timestamps:true})
+},
+{timestamps:true,
+    toJSON: {
+    transform: (doc, ret) => {
+        delete ret.password;
+        delete ret.refreshToken;
+        delete ret.__v;
+        return ret;
+    },
+},
+}
+);
 
-userSchema.pre("save", async function (next){
-    if (!this.isModified("password")) return next();
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+    
+    this.password = await bcrypt.hash(this.password, 10);
+});
 
-    this.password = bcrypt.hash(this.password,10)
-    next()
-})
 
 userSchema.methods.isPasswordCorrect= async function (password) {
     return await bcrypt.compare(password, this.password);

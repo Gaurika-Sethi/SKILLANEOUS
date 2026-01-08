@@ -18,4 +18,14 @@ import userRoutes from './routes/user.routes.js';
 
 app.use('/api/v1/users', userRoutes);
 
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    
+    res.status(statusCode).json({
+        success: false,
+        message: err.message || "Internal Server Error",
+        errors: err.errors || [],
+    });
+});
+
 export {app};
