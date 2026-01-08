@@ -6,7 +6,7 @@ import LoginPage from "./login";
 import ThemeSelection from "./resume";
 export default function Navbar() {
   return (
-    <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md border-b border-white/10">
+    <nav className="fixed top-0 w-full z-50 bg-[#0a0a0c] backdrop-blur-md border-b border-white/10">
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
 
         {/* Left: Logo + Text */}
@@ -14,8 +14,8 @@ export default function Navbar() {
           <Image
             src="/logo.png"
             alt="Skillaneous Logo"
-            width={32}
-            height={32}
+            width={36}
+            height={36}
             priority
           />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#837FA4] via-[#7EA9AC] to-[#C390D4]">
