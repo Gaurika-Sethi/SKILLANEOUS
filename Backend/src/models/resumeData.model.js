@@ -1,11 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
 const resumeDataSchema = new Schema({
-    source: {
-        type: String,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
-        enum: ["form", "pdf", "docx"],
     },
+
     personalInfo: {
         fullName: String,
         email: String,
@@ -76,7 +77,7 @@ const resumeDataSchema = new Schema({
                 {
                     type: {
                         type: String,
-                        enum: ["github", "live", "demo", "figma", "docs", "other"],
+                        enum: ["github", "live", "demo", "figma", "other"],
                         default: "other",
                     },
                     url: {
