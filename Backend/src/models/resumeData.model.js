@@ -88,6 +88,7 @@ const resumeDataSchema = new Schema({
             ],
         },
     ],
+
     education: {
         institution: String,
         degree: String,
@@ -107,5 +108,7 @@ const resumeDataSchema = new Schema({
         index: {expires: 0},
     },
 }, {timestamps: true})
+
+resumeDataSchema.index({ expirationAt: 1 }, { unique: true });
 
 export const ResumeData = mongoose.model("ResumeData", resumeDataSchema);
