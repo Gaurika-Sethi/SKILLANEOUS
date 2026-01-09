@@ -12,16 +12,23 @@ const resumeDataSchema = new Schema({
         email: String,
         phone: String,
         location: String,
+        links: [
+                {
+                    label: {
+                        type: String,
+                        default: "",
+                    },
+                    url: {
+                        type: String,
+                        default: "",
+                    },
+                },
+            ],
 
         photoUrl: {
             type: String,
             default: "",
         },
-
-        links: [{
-            label: String,
-            url: String,
-        }],
     },
     summary: {
         type: String,
@@ -109,6 +116,6 @@ const resumeDataSchema = new Schema({
     },
 }, {timestamps: true})
 
-resumeDataSchema.index({ expirationAt: 1 }, { unique: true });
+resumeDataSchema.index({ expirationAt: 1 }, { expireAfterSeconds: 0 });
 
 export const ResumeData = mongoose.model("ResumeData", resumeDataSchema);
