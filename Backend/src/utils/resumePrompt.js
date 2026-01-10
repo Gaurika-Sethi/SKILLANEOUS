@@ -2,19 +2,24 @@
 
 const buildResumeGenerationPrompt = ({
     resumeData,
-    templateType,
-    tone,
-    targetRole,
+    templateType= "ats",
+    tone= "professional",
+    targetRole= "",
 }) => {
     const {
-        personalInfo,
-        summary,
-        parsedSkills,
-        experience,
-        projects,
-        education,
-        achievements,
-    } = resumeData;
+        personalInfo= {},
+        summary= "",
+        parsedSkills= [],
+        experience= [],
+        projects= [],
+        education= {},
+        achievements= [],
+    } = resumeData || {};
+
+    const formatBullets = (arr = []) => {
+    if (!arr.length) return "None";
+    return arr.map((b) => `- ${b}`).join("\n");
+    };
     
     return `
     You are an expert resume writer and ATS optimization assistant.
@@ -32,6 +37,7 @@ const buildResumeGenerationPrompt = ({
     - Make bullets strong using action verbs.
     - Keep each bullet max 1 line.
     - Output ONLY valid JSON. No markdown. No explanation.
+    - Output MUST start with { and end with }.
     
     INPUT DATA:
     Personal Info:
@@ -56,10 +62,11 @@ const buildResumeGenerationPrompt = ({
         experience?.length
         ? experience
         .map(
-            (e, i) => `${i + 1}. ${e.role} at ${e.company} (${e.startDate} - ${e.endDate})
-            Bullets: ${(e.description || []).join(" | ")}`
+            (e, i) => `${i + 1} Role: ${e.role} at company: ${e.company} for duration: (${e.startDate} - ${e.endDate})
+            Bullets: ${formatBullets(e.description || [])}`
+            .trim()
         )
-        .join("\n")
+        .join("\n\n")
         : "None"
     }
 
@@ -68,17 +75,18 @@ const buildResumeGenerationPrompt = ({
         projects?.length
         ? projects
         .map(
-            (p, i) => `${i + 1}. ${p.title}
-            Tech Stack: ${(p.techStack || []).join(", ")}
-            Duration: ${p.duration || ""}
-            Bullets: ${(p.description || []).join(" | ")}
+            (p, i) => `${i + 1} title: ${p.title}
+            Tech Stack: ${(p.techStack || []).join(", ")|| "None"}
+            Duration: ${p.duration || "None"}
+            Bullets: ${formatBullets(p.description || [])}
             Links: ${
                 p.links?.length
                 ? p.links.map((l) => `${l.type}: ${l.url}`).join(", ")
                 : "None"
             }`
+            .trim()
         )
-        .join("\n")
+        .join("\n\n")
         : "None"
     }
 
@@ -89,11 +97,17 @@ const buildResumeGenerationPrompt = ({
     Graduation Year: ${education?.graduationYear || ""}
     
     Achievements:
-    ${achievements?.length ? achievements.join(" | ") : "None"}
+    ${achievements?.length ? formatBullets(achievements) : "None"}
     
     OUTPUT JSON FORMAT (must follow exactly):
     {
-    "headline": "",
+    "PersonalInfo": {
+    "fullName": "",
+    "email": "",
+    "phone": "",
+    "location": "",
+    "links": [{ "label": "", "url": "" }],
+    },
     "summary": "",
     "skills": [],
     "experience": [
