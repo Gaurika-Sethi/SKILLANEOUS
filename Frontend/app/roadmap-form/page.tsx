@@ -27,7 +27,7 @@ export default function RoadmapForm() {
     fieldToWorkIn: "",
     purpose: "",
     whatToLearn: "",
-    timeline: { value: 3, unit: "months" }
+    timeline: { value: 0, unit: "months" }
   });
 
   const [existingSkills, setExistingSkills] = useState<SkillEntry[]>([
@@ -56,8 +56,7 @@ export default function RoadmapForm() {
     return (
       formData.fieldToWorkIn.trim() !== "" &&
       formData.purpose.trim() !== "" &&
-      formData.timeline.value > 0 &&
-      existingSkills.every(s => s.skill.trim() !== "")
+      formData.timeline.value > 0
     );
   };
 
@@ -249,7 +248,12 @@ export default function RoadmapForm() {
 
         <div className="pt-6">
           <button 
-            onClick={() => { setShowErrors(true); if(isFormValid()) console.log("Valid!"); }}
+            onClick={() => { 
+              setShowErrors(true); 
+              if(isFormValid()) {
+                router.push("/roadmap");
+              }
+            }}
             className="w-full flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.97] shadow-2xl shadow-purple-500/20"
           >
             GENERATE CUSTOM ROADMAP <ChevronRight size={24} />
