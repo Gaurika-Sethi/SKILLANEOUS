@@ -1,12 +1,4 @@
-import {
-  Upload,
-  Cpu,
-  Map,
-  Target,
-  Zap,
-  Briefcase,
-  ChevronRight,
-} from "lucide-react";
+import {Upload,Cpu,Map,Target,Zap,Briefcase} from "lucide-react";
 
 export default function HowItWorksPage() {
   // Data for "How It Works"
