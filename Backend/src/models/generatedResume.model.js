@@ -29,7 +29,7 @@ const generatedResumeSchema = new Schema({
         default: "professional",
     },
     content: {
-        type: String,
+        type: Schema.Types.Mixed,
         required: true,
     },
     ai_metadata: {
