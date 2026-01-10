@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import WorkflowSection from './how_it_works';
 import Link from 'next/link';
 import { CheckCircle2, Circle, Sparkles, TrendingUp, User, Map, CheckSquare, FileText, Code, Database, Monitor, FolderKanban, Layers, Rocket, Clock, Linkedin, Github, Cpu, Zap, Target, ArrowRight } from 'lucide-react';
 
@@ -71,12 +70,12 @@ const CareerLanding = () => {
           </p>
           
           <div className="flex flex-wrap gap-4 pt-4">
-            <button className="relative group p-[2px] rounded-xl bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-400 transition-all hover:scale-105 active:scale-95 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]">
+            <Link href="/roadmap-form" className="relative group p-[2px] rounded-xl bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-400 transition-all hover:scale-105 active:scale-95 hover:shadow-[0_0_30px_rgba(6,182,212,0.2)]">
               <div className="relative bg-[#0a0a0c]/90 backdrop-blur-md text-white px-8 py-4 rounded-[10px] text-sm tracking-widest uppercase transition-all group-hover:bg-[#0a0a0c]/70 group-hover:backdrop-blur-lg overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8CE5E9]/10 via-[#C79BFF]/10 to-[#E1A7C4]/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <span className="relative z-10">Generate My Roadmap</span>
               </div>
-            </button>
+            </Link>
            <Link
            href="/how-it-works"
            className="relative group inline-flex items-center justify-center px-8 py-4 rounded-xl border border-white/20 bg-[#14141a]/80 backdrop-blur-md hover:bg-[#1c1c24]/80 hover:backdrop-blur-lg hover:border-white/30 text-sm tracking-widest uppercase transition-all overflow-hidden"
@@ -361,11 +360,11 @@ const RoadmapPreview = () => {
         </div>
 
         <div className="mt-20 text-center">
-          <button className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 hover:scale-105 transition-all">
+          <Link href="/roadmap-form" className="relative group p-[2px] rounded-2xl bg-gradient-to-r from-cyan-400 via-purple-500 to-pink-500 hover:scale-105 transition-all inline-block">
             <div className="bg-[#0a0a0c] text-white px-10 py-4 rounded-[14px]  text-xs tracking-widest uppercase transition-all duration-500 ease-in-out group-hover:bg-transparent">
               Generate My Custom Roadmap
             </div>
-          </button>
+          </Link>
         </div>
       </div>
     </section>
