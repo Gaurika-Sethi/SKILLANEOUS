@@ -1,26 +1,34 @@
 import mongoose, { Schema } from "mongoose";
 
 const resumeDataSchema = new Schema({
-    source: {
-        type: String,
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true,
-        enum: ["form", "pdf", "docx"],
     },
+
     personalInfo: {
         fullName: String,
         email: String,
         phone: String,
         location: String,
+        links: [
+                {
+                    label: {
+                        type: String,
+                        default: "",
+                    },
+                    url: {
+                        type: String,
+                        default: "",
+                    },
+                },
+            ],
 
         photoUrl: {
             type: String,
             default: "",
         },
-
-        links: [{
-            label: String,
-            url: String,
-        }],
     },
     summary: {
         type: String,
@@ -76,7 +84,7 @@ const resumeDataSchema = new Schema({
                 {
                     type: {
                         type: String,
-                        enum: ["github", "live", "demo", "figma", "docs", "other"],
+                        enum: ["github", "live", "demo", "figma", "other"],
                         default: "other",
                     },
                     url: {
@@ -87,6 +95,7 @@ const resumeDataSchema = new Schema({
             ],
         },
     ],
+
     education: {
         institution: String,
         degree: String,
@@ -106,5 +115,7 @@ const resumeDataSchema = new Schema({
         index: {expires: 0},
     },
 }, {timestamps: true})
+
+resumeDataSchema.index({ expirationAt: 1 }, { expireAfterSeconds: 0 });
 
 export const ResumeData = mongoose.model("ResumeData", resumeDataSchema);

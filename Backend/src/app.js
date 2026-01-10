@@ -15,8 +15,10 @@ app.use(cookieParser());
 
 // Routes would be added here
 import userRoutes from './routes/user.routes.js';
-
 app.use('/api/v1/users', userRoutes);
+
+import resumeRoutes from './routes/resume.routes.js';
+app.use('/api/v1/resume', resumeRoutes);
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
