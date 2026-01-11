@@ -16,11 +16,20 @@
             color: #1E293B;
             margin-bottom: 1rem;
         }
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
     </style>
 </head>
-<body class="bg-gray-100 py-10">
+<body class="bg-white p-0 m-0">
 
-    <div class="max-w-[800px] mx-auto bg-white p-12 shadow-sm min-h-[1056px]">
+    <div class="max-w-full bg-white p-12 shadow-sm">
         
         <header class="mb-8">
             <h1 class="text-4xl font-extrabold text-[#334155] mb-2 uppercase tracking-tight">
@@ -31,11 +40,10 @@
                 <span class="text-gray-300">|</span>
                 <span>{{personalInfo.email}}</span>
                 <span class="text-gray-300">|</span>
-                <span>{{personalInfo.links.[0].url}}</span>
-                <span class="text-gray-300">|</span>
-                <a href="#" class="uppercase underline decoration-gray-300">Linkedin</a>
-                <span class="text-gray-300">|</span>
-                <a href="#" class="uppercase underline decoration-gray-300">Github</a>
+                {{#each personalInfo.links}}
+                <a href="{{this.url}}">{{this.label}}</a>
+                {{/each}}
+
             </div>
         </header>
 
@@ -79,10 +87,10 @@
             <div class="section-header">Education</div>
             <div class="flex justify-between items-baseline">
                 <div>
-                    <h3 class="text-sm font-bold text-[#1E293B]">{{this.degree}}</h3>
-                    <p class="text-xs text-[#475569]">{{this.institution}}</p>
+                    <h3 class="text-sm font-bold text-[#1E293B]">{{education.degree}}</h3>
+                    <p class="text-xs text-[#475569]">{{education.institution}}</p>
                 </div>
-                <span class="text-[10px] italic text-gray-500 font-medium">{{this.graduation_year}}</span>
+                <span class="text-[10px] italic text-gray-500 font-medium">{{education.graduation_year}}</span>
             </div>
         </section>
 
@@ -98,7 +106,7 @@
                     <span class="text-[10px] italic text-gray-500 font-medium">{{this.duration}}</span>
                 </div>
                 <p class="text-[11px] font-mono text-gray-600 mb-1.5 italic">
-                    {{this.tech_stack.join(' | ')}}
+                    {{join this.tech_stack " | "}}
                 </p>
                 <p class="text-[11px] text-[#475569] leading-snug">
                     {{this.description.[0]}}

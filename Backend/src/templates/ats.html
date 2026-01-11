@@ -9,11 +9,19 @@
         .purple-accent { color: #8B5CF6; } /* matches text-violet-500 */
         .section-divider { border-bottom: 2px solid #8B5CF6; margin-bottom: 1rem; }
         .sub-divider { border-bottom: 1px solid #E2E8F0; margin: 1rem 0; }
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
     </style>
 </head>
-<body class="bg-slate-50 py-12">
+<body class="bg-white p-0 m-0">
 
-    <div class="max-w-[850px] mx-auto bg-white p-16 shadow-lg min-h-[1100px] text-slate-800">
+    <div class="max-w-full bg-white p-8 shadow-lg text-slate-800">
         
         <header class="text-center mb-10">
             <h1 class="text-5xl font-bold tracking-tight mb-4 uppercase">{{personalInfo.full_name}}</h1>
@@ -25,11 +33,17 @@
                 <span class="purple-accent font-medium">{{personalInfo.email}}</span>
             </div>
             <div class="flex justify-center gap-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
-                <a href="#" class="underline decoration-slate-300">Linkedin</a>
+                {{#each personalInfo.links}}
+                <a href="{{this.url}}">{{this.label}}</a>
+                {{/each}}
                 <span>|</span>
-                <a href="#" class="underline decoration-slate-300">Github</a>
+                {{#each personalInfo.links}}
+                <a href="{{this.url}}">{{this.label}}</a>
+                {{/each}}
                 <span>|</span>
-                <span class="lowercase text-slate-400">www.reallygreatsite.com</span>
+                {{#each personalInfo.links}}
+                <a href="{{this.url}}">{{this.label}}</a>
+                {{/each}}
             </div>
             <div class="sub-divider mt-6"></div>
         </header>
@@ -63,10 +77,10 @@
         <section class="mb-10">
             <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Education</h2>
             <div class="flex justify-between items-baseline">
-                <h3 class="text-md font-bold text-slate-900">{{this.degree}}</h3>
-                <span class="text-sm font-semibold text-slate-500">{{this.graduation_year}}</span>
+                <h3 class="text-md font-bold text-slate-900">{{education.degree}}</h3>
+                <span class="text-sm font-semibold text-slate-500">{{education.graduation_year}}</span>
             </div>
-            <p class="text-sm text-slate-600">{{this.institution}}</p>
+            <p class="text-sm text-slate-600">{{education.institution}}</p>
             <div class="sub-divider"></div>
         </section>
 
@@ -81,7 +95,7 @@
                     <span class="text-xs font-bold text-slate-500 uppercase italic">{{this.duration}}</span>
                 </div>
                 <p class="text-xs purple-accent font-medium mb-2 italic">
-                    {{this.tech_stack.join(' | ')}}
+                    {{join this.tech_stack " | "}}
                 </p>
                 <p class="text-xs text-slate-700 leading-normal mb-1">
                     {{this.description.[0]}}
