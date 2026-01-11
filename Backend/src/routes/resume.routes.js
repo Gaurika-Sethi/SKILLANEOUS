@@ -3,7 +3,6 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { createResumeData } from "../controllers/resumeData.controller.js";
 import { generateResume } from "../controllers/generatedResume.controller.js";
-import mongoose from "mongoose";
 
 const router = Router();
 

@@ -23,9 +23,7 @@ const createResumeData = asyncHandler(async (req, res) => {
     }
 
     const personalInfo = req.body.personalInfo ? JSON.parse(req.body.personalInfo) : {};
-    if (photoUrl) {
-        personalInfo.photoUrl = photoUrl;
-    }
+    personalInfo.photoUrl = photoUrl || "";
 
     const parsedSkills = req.body.parsedSkills ? JSON.parse(req.body.parsedSkills) : [];
     const experience = req.body.experience ? JSON.parse(req.body.experience) : [];

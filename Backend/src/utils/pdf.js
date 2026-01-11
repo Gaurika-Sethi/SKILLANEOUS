@@ -10,6 +10,22 @@ const generatePdfFromHtml = async (html) => {
         const page = await browser.newPage();
         await page.setContent(html, { waitUntil: "networkidle0" });
 
+            await page.evaluate(async () => {
+                const imgs = Array.from(document.images);
+                await Promise.all(
+                    imgs.map((img) => {
+                        if (img.complete) return Promise.resolve();
+                        return new Promise((resolve, reject) => {
+                            img.addEventListener("load", resolve);
+                            img.addEventListener("error", resolve); 
+                        })
+                    }),
+                );
+            });
+
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+    await sleep(300);
+
     const pdfBuffer = await page.pdf({
         format: "A4",
         printBackground: true,

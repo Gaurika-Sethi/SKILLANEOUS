@@ -44,6 +44,11 @@ const generateResume = asyncHandler(async (req, res) => {
 
     // Normalize content
     const normalized = normalizeGeneratedResumeContent(aiResponse);
+    normalized.personalInfo.photoUrl = resumeData?.personalInfo?.photoUrl || "";
+    
+    if (templateType === "creative"&& !normalized.personalInfo.photoUrl) {
+        throw new ApiError(400, "Photo is required for the creative template.");
+    }
 
     // Save normalized content
     const generatedResume = await GeneratedResume.create({
@@ -60,6 +65,8 @@ const generateResume = asyncHandler(async (req, res) => {
             temperature: 0.2,
         },
     });
+
+    console.log("PHOTO URL IN NORMALIZED:", normalized?.personalInfo?.photoUrl);
 
   // Render + PDF
     const html = renderResumeHtml({ templateType, data: normalized });
