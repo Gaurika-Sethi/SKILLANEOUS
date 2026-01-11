@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { 
   Calendar, 
   CheckCircle2, 
@@ -8,8 +9,13 @@ import {
   Sparkles, 
   Trophy,
   Download,
-  AlertTriangle
+  AlertTriangle,
+  ChevronDown,
+  FileImage,
+  FileText
 } from "lucide-react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 
 type Roadmap = {
   title: string;
@@ -25,21 +31,47 @@ type Roadmap = {
 };
 
 export default function RoadmapView({ roadmap, visibility = "public" }: { roadmap: Roadmap; visibility?: "public" | "private" }) {
-  const handleDownload = () => {
-    const jsonString = JSON.stringify(roadmap, null, 2);
-    const blob = new Blob([jsonString], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${roadmap.title.replace(/\s+/g, "_")}_roadmap.json`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  const [selectedFormat, setSelectedFormat] = useState<"png" | "jpg" | "pdf">("png");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const roadmapRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async () => {
+    if (!roadmapRef.current) return;
+
+    try {
+      const canvas = await html2canvas(roadmapRef.current, {
+        backgroundColor: "#050505",
+        scale: 2,
+        logging: false,
+      });
+
+      const fileName = `${roadmap.title.replace(/\s+/g, "_")}_roadmap`;
+
+      if (selectedFormat === "png" || selectedFormat === "jpg") {
+        const imgData = canvas.toDataURL(`image/${selectedFormat}`);
+        const link = document.createElement("a");
+        link.href = imgData;
+        link.download = `${fileName}.${selectedFormat}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (selectedFormat === "pdf") {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jsPDF({
+          orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+          unit: "px",
+          format: [canvas.width, canvas.height],
+        });
+        pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+        pdf.save(`${fileName}.pdf`);
+      }
+    } catch (error) {
+      console.error("Download failed:", error);
+    }
   };
   return (
     <div className="min-h-screen bg-[#050505] text-white px-6 py-24 font-sans selection:bg-purple-500/30">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto" ref={roadmapRef}>
         
         {/* Private Roadmap Warning */}
         {visibility === "private" && (
@@ -57,13 +89,49 @@ export default function RoadmapView({ roadmap, visibility = "public" }: { roadma
         )}
 
         {/* Download Button Section */}
-        <div className="mb-8 flex justify-end">
+        <div className="mb-8 flex justify-end items-center gap-3">
+          {/* Format Selector */}
+          <div className="relative">
+            <button
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              className="flex items-center gap-2 px-4 py-3 bg-[#1a1a1a] border border-white/10 text-white font-medium rounded-xl hover:border-white/20 transition-all"
+            >
+              {selectedFormat === "png" && <FileImage size={18} />}
+              {selectedFormat === "jpg" && <FileImage size={18} />}
+              {selectedFormat === "pdf" && <FileText size={18} />}
+              <span className="uppercase text-sm">{selectedFormat}</span>
+              <ChevronDown size={16} className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""}`} />
+            </button>
+            
+            {isDropdownOpen && (
+              <div className="absolute top-full mt-2 right-0 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden shadow-xl z-50 min-w-[120px]">
+                {["png", "jpg", "pdf"].map((format) => (
+                  <button
+                    key={format}
+                    onClick={() => {
+                      setSelectedFormat(format as "png" | "jpg" | "pdf");
+                      setIsDropdownOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 text-left text-sm uppercase font-medium transition-colors ${
+                      selectedFormat === format
+                        ? "bg-purple-600 text-white"
+                        : "text-gray-300 hover:bg-white/5"
+                    }`}
+                  >
+                    {format}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Download Button */}
           <button
             onClick={handleDownload}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/20"
           >
             <Download size={18} />
-            Download Roadmap
+            Download
           </button>
         </div>
         
