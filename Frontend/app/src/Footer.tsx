@@ -36,8 +36,6 @@ export default function Footer() {
             <ul className="space-y-2 text-sm text-white/60">
               <li><Link href="#" className="hover:text-white transition">Features</Link></li>
               <li><Link href="#" className="hover:text-white transition">Roadmaps</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Pricing</Link></li>
-              <li><Link href="#" className="hover:text-white transition">API</Link></li>
             </ul>
           </div>
 
@@ -45,10 +43,8 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">Company</h4>
             <ul className="space-y-2 text-sm text-white/60">
-              <li><Link href="#" className="hover:text-white transition">About</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Blog</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Careers</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Contact</Link></li>
+              <li><Link href="/about" className="hover:text-white transition">About</Link></li>
+              <li><Link href="/contact" className="hover:text-white transition">Contact</Link></li>
             </ul>
           </div>
 
@@ -56,10 +52,8 @@ export default function Footer() {
           <div>
             <h4 className="text-sm font-semibold text-white mb-4">Legal</h4>
             <ul className="space-y-2 text-sm text-white/60">
-              <li><Link href="#" className="hover:text-white transition">Privacy</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Terms</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Security</Link></li>
-              <li><Link href="#" className="hover:text-white transition">Cookies</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Privacy & Cookies</Link></li>
+              <li><Link href="#" className="hover:text-white transition">Terms & Security</Link></li>
             </ul>
           </div>
         </div>
