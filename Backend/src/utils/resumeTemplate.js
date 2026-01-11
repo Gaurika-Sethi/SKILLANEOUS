@@ -18,6 +18,11 @@ Handlebars.registerHelper("join", function (arr, sep) {
     return arr.join(sep);
 });
 
+Handlebars.registerHelper("inc", function (value) {
+    return parseInt(value, 10) + 1;
+});
+
+
 const renderResumeHtml = ({ templateType, data }) => {
     const filename = templateMap[templateType] || templateMap.ats;
 

@@ -6,9 +6,9 @@ import { buildResumeGenerationPrompt } from "../utils/resumePrompt.js";
 import { generateResumeFromAI } from "../utils/ai.js";
 import { safeJsonParse } from "../utils/json.js";
 
-import { normalizeGeneratedResumeContent } from "../utils/normalizeGeneratedResume.util.js";
-import { renderResumeHtml } from "../utils/resumeTemplate.util.js";
-import { generatePdfFromHtml } from "../utils/pdf.util.js";
+import { normalizeGeneratedResumeContent } from "../utils/normalizeGeneratedResume.js";
+import { renderResumeHtml } from "../utils/resumeTemplate.js";
+import { generatePdfFromHtml } from "../utils/pdf.js";
 
 const generateResume = asyncHandler(async (req, res) => {
     const userId = req.user._id;
