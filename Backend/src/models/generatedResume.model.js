@@ -40,7 +40,7 @@ const generatedResumeSchema = new Schema({
     expiresAt: {
         type: Date,
         required: true,
-        default: () => Date.now() + 1000 * 60 * 10, 
+        default: () => Date.now() + 1000 * 60 * 60, 
         index: {expires: 0},
     },
 },{timestamps:true})

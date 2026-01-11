@@ -38,6 +38,7 @@ const buildResumeGenerationPrompt = ({
     - Keep each bullet max 1 line.
     - Output ONLY valid JSON. No markdown. No explanation.
     - Output MUST start with { and end with }.
+    -All the fields in the Output should be camelCase.
     
     INPUT DATA:
     Personal Info:

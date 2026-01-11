@@ -44,6 +44,7 @@ const createResumeData = asyncHandler(async (req, res) => {
         achievements,
     })
 
+    await resumeData.save();
 
     return res.status(201).json(
         new ApiResponse(

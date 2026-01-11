@@ -9,7 +9,7 @@ import { safeJsonParse } from "../utils/json.js";
 
 const generateResume = asyncHandler(async (req, res) => {
     const userId = req.user._id;
-
+    
     const { resumeDataId, targetRole, templateType, tone } = req.body;
 
     if (!resumeDataId) {
@@ -20,13 +20,12 @@ const generateResume = asyncHandler(async (req, res) => {
         throw new ApiError(400, "templateType is required.");
     }
 
-    const resumeData = await ResumeData.findById(resumeDataId);
+    const resumeData = await ResumeData.findById(resumeDataId).lean();
 
-    if (!resumeData){
+    if (!resumeData) {
         throw new ApiError(404, "Resume data not found.");
     }
 
-    // Build prompt
     const prompt = buildResumeGenerationPrompt({
         resumeData,
         targetRole,
@@ -34,40 +33,40 @@ const generateResume = asyncHandler(async (req, res) => {
         tone,
     });
 
-    // AI call
-    const aiRaw= await generateResumeFromAI({ 
+    const model = "gpt-4o-mini";
+
+    const aiRaw = await generateResumeFromAI({
         prompt,
-        model: "gemini-2.5-flash-lite",
+        model,
         temperature: 0.2,
     });
 
-    // Parse AI response
-    const aiResponse= safeJsonParse(aiRaw);
+    const aiResponse = safeJsonParse(aiRaw);
 
-    // Save generated resume
-    const generatedResume= new GeneratedResume({
+    const generatedResume = await GeneratedResume.create({
         resumeDataId,
         userId,
         targetRole: targetRole || "",
         templateType,
         tone: tone || "professional",
-        content: JSON.stringify(aiResponse),
-        ai_metadata:{
-            model: "gemini-2.5-flash-lite",
+        content: aiResponse,
+        ai_metadata: {
+            provider: "openai",          
+            model,
             prompt_version: "v1",
             temperature: 0.2,
         },
     });
 
-    res
-    .status(201)
-    .json(
+    const parsedContent = safeJsonParse(generatedResume.content);
+
+    return res.status(201).json(
         new ApiResponse(
-            200,
-            generatedResume,
-            "Resume generated successfully."
-        )
-    );
+        201,
+        generatedResume,
+        "Resume generated successfully."
+    )
+);
 });
 
 export { generateResume };
