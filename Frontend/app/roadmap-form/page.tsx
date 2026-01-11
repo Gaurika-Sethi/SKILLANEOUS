@@ -10,7 +10,9 @@ import {
   Lightbulb, 
   Wrench, 
   ChevronRight,
-  AlertCircle 
+  AlertCircle,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 interface SkillEntry {
@@ -27,7 +29,8 @@ export default function RoadmapForm() {
     fieldToWorkIn: "",
     purpose: "",
     whatToLearn: "",
-    timeline: { value: 0, unit: "months" }
+    timeline: { value: 0, unit: "months" },
+    visibility: "public" as "public" | "private"
   });
 
   const [existingSkills, setExistingSkills] = useState<SkillEntry[]>([
@@ -56,7 +59,8 @@ export default function RoadmapForm() {
     return (
       formData.fieldToWorkIn.trim() !== "" &&
       formData.purpose.trim() !== "" &&
-      formData.timeline.value > 0
+      formData.timeline.value > 0 &&
+      (formData.visibility === "public" || formData.visibility === "private")
     );
   };
 
@@ -246,12 +250,46 @@ export default function RoadmapForm() {
           />
         </section>
 
+        {/* 5. VISIBILITY */}
+        <section className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-8 space-y-6">
+          <div className="flex items-center gap-2 text-indigo-400">
+            <Eye size={22} />
+            <h2 className="text-2xl font-semibold text-white">Visibility</h2> <span className="text-pink-500">*</span>
+          </div>
+          <div className="flex bg-[#262626] p-1 rounded-xl border border-white/5 max-w-md gap-1">
+            <button
+              onClick={() => setFormData({...formData, visibility: "public"})}
+              className={`flex-1 py-3 px-6 text-sm font-bold rounded-lg transition-all capitalize flex items-center justify-center gap-2 ${
+                formData.visibility === "public" ? "bg-gradient-to-r from-indigo-400 to-cyan-600 text-white shadow-lg shadow-emerald-500/20" : "text-gray-500"
+              }`}
+            >
+              <Eye size={18} />
+              Public
+            </button>
+            
+            <button
+              onClick={() => setFormData({...formData, visibility: "private"})}
+              className={`flex-1 py-3 px-6 text-sm font-bold rounded-lg transition-all capitalize flex items-center justify-center gap-2 ${
+                formData.visibility === "private" ? "bg-gradient-to-r from-pink-600 to-purple-400 text-white shadow-lg shadow-slate-500/20" : "text-gray-500"
+              }`}
+            >
+              <EyeOff size={18} />
+              Private
+            </button>
+          </div>
+          <p className="text-gray-500 text-sm">
+            {formData.visibility === "public" 
+              ? "Your roadmap will be visible to others and can be shared."
+              : "Your roadmap will be private and only visible to you."}
+          </p>
+        </section>
+
         <div className="pt-6">
           <button 
             onClick={() => { 
               setShowErrors(true); 
               if(isFormValid()) {
-                router.push("/roadmap");
+                router.push(`/roadmap?visibility=${formData.visibility}`);
               }
             }}
             className="w-full flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.97] shadow-2xl shadow-purple-500/20"

@@ -6,7 +6,9 @@ import {
   ChevronRight, 
   Clock, 
   Sparkles, 
-  Trophy 
+  Trophy,
+  Download,
+  AlertTriangle
 } from "lucide-react";
 
 type Roadmap = {
@@ -22,10 +24,48 @@ type Roadmap = {
   }[];
 };
 
-export default function RoadmapView({ roadmap }: { roadmap: Roadmap }) {
+export default function RoadmapView({ roadmap, visibility = "public" }: { roadmap: Roadmap; visibility?: "public" | "private" }) {
+  const handleDownload = () => {
+    const jsonString = JSON.stringify(roadmap, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${roadmap.title.replace(/\s+/g, "_")}_roadmap.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
   return (
     <div className="min-h-screen bg-[#050505] text-white px-6 py-24 font-sans selection:bg-purple-500/30">
       <div className="max-w-4xl mx-auto">
+        
+        {/* Private Roadmap Warning */}
+        {visibility === "private" && (
+          <div className="mb-8 p-6 rounded-2xl bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/30">
+            <div className="flex items-start gap-4">
+              <AlertTriangle size={24} className="text-orange-400 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-orange-300 mb-2">Private Roadmap - Limited Access</h3>
+                <p className="text-gray-300 text-sm leading-relaxed">
+                  This roadmap will be <strong>automatically deleted after 60 minutes</strong>. We recommend downloading it now to keep a permanent copy.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Download Button Section */}
+        <div className="mb-8 flex justify-end">
+          <button
+            onClick={handleDownload}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-500 hover:to-cyan-500 text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-purple-500/20"
+          >
+            <Download size={18} />
+            Download Roadmap
+          </button>
+        </div>
         
         {/* Header Section */}
         <header className="mb-20 space-y-6">
