@@ -23,8 +23,12 @@
 
     <div class="max-w-full bg-white p-8 shadow-lg text-slate-800">
         
+        <!-- HEADER -->
         <header class="text-center mb-10">
-            <h1 class="text-5xl font-bold tracking-tight mb-4 uppercase">{{personalInfo.full_name}}</h1>
+            <h1 class="text-5xl font-bold tracking-tight mb-4 uppercase">
+                {{personalInfo.full_name}}
+            </h1>
+
             <div class="flex flex-wrap justify-center items-center gap-2 text-sm text-slate-600 mb-2">
                 <span>{{personalInfo.location}}</span>
                 <span class="text-slate-300">•</span>
@@ -32,22 +36,23 @@
                 <span class="text-slate-300">•</span>
                 <span class="purple-accent font-medium">{{personalInfo.email}}</span>
             </div>
-            <div class="flex justify-center gap-4 text-xs font-semibold uppercase tracking-widest text-slate-500">
+
+            <!-- LINKS (FIXED) -->
+            <div class="flex justify-center items-center gap-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
                 {{#each personalInfo.links}}
-                <a href="{{this.url}}">{{this.label}}</a>
-                {{/each}}
-                <span>|</span>
-                {{#each personalInfo.links}}
-                <a href="{{this.url}}">{{this.label}}</a>
-                {{/each}}
-                <span>|</span>
-                {{#each personalInfo.links}}
-                <a href="{{this.url}}">{{this.label}}</a>
+                    <a href="{{this.url}}" target="_blank" rel="noopener noreferrer">
+                        {{this.label}}
+                    </a>
+                    {{#unless @last}}
+                        <span class="text-slate-300">|</span>
+                    {{/unless}}
                 {{/each}}
             </div>
+
             <div class="sub-divider mt-6"></div>
         </header>
 
+        <!-- SUMMARY -->
         <section class="mb-10">
             <h2 class="text-lg font-bold uppercase tracking-wider mb-3">Summary</h2>
             <p class="text-sm leading-relaxed text-slate-700">
@@ -56,13 +61,18 @@
             <div class="sub-divider"></div>
         </section>
 
+        <!-- WORK EXPERIENCE -->
         <section class="mb-10">
             <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Work Experience</h2>
             {{#each experience}}
             <div class="mb-8">
                 <div class="flex justify-between items-baseline mb-2">
-                    <h3 class="text-md font-bold text-slate-900">{{this.role}}, {{this.company}}</h3>
-                    <span class="text-sm font-semibold text-slate-500">{{this.start_date}} - {{this.end_date}}</span>
+                    <h3 class="text-md font-bold text-slate-900">
+                        {{this.role}}, {{this.company}}
+                    </h3>
+                    <span class="text-sm font-semibold text-slate-500">
+                        {{this.start_date}} - {{this.end_date}}
+                    </span>
                 </div>
                 <ul class="list-disc ml-5 text-sm text-slate-700 space-y-2">
                     {{#each this.description}}
@@ -74,25 +84,36 @@
             <div class="sub-divider"></div>
         </section>
 
+        <!-- EDUCATION -->
         <section class="mb-10">
             <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Education</h2>
             <div class="flex justify-between items-baseline">
-                <h3 class="text-md font-bold text-slate-900">{{education.degree}}</h3>
-                <span class="text-sm font-semibold text-slate-500">{{education.graduation_year}}</span>
+                <h3 class="text-md font-bold text-slate-900">
+                    {{education.degree}}
+                </h3>
+                <span class="text-sm font-semibold text-slate-500">
+                    {{education.graduation_year}}
+                </span>
             </div>
-            <p class="text-sm text-slate-600">{{education.institution}}</p>
+            <p class="text-sm text-slate-600">
+                {{education.institution}}
+            </p>
             <div class="sub-divider"></div>
         </section>
 
+        <!-- PROJECTS -->
         <section class="mb-10">
             <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Projects</h2>
             {{#each projects}}
             <div class="mb-6">
                 <div class="flex justify-between items-baseline mb-1">
                     <h4 class="text-sm font-bold text-slate-900">
-                        {{this.title}} <span class="text-slate-400 font-normal">🔗</span>
+                        {{this.title}}
+                        <span class="text-slate-400 font-normal">🔗</span>
                     </h4>
-                    <span class="text-xs font-bold text-slate-500 uppercase italic">{{this.duration}}</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase italic">
+                        {{this.duration}}
+                    </span>
                 </div>
                 <p class="text-xs purple-accent font-medium mb-2 italic">
                     {{join this.tech_stack " | "}}
@@ -105,6 +126,7 @@
             <div class="sub-divider"></div>
         </section>
 
+        <!-- ACHIEVEMENTS -->
         <section>
             <h2 class="text-lg font-bold uppercase tracking-wider mb-4">Achievements</h2>
             <ul class="list-disc ml-5 text-sm text-slate-700 space-y-2">
