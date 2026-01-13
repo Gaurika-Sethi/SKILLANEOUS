@@ -206,36 +206,7 @@ export default function RoadmapForm() {
             <button onClick={addSkill} className="flex items-center gap-2 text-cyan-400 text-sm font-bold hover:text-cyan-300 px-1"><Plus size={20} /> ADD ANOTHER SKILL</button>
           </div>
         </section>
-
-        {/* 3. TIMELINE */}
-        <section className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-8 space-y-6">
-          <div className="flex items-center gap-2 text-violet-400">
-            <Clock size={22} />
-            <h2 className="text-2xl font-semibold text-white">Timeline</h2> <span className="text-pink-500">*</span>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md">
-            <input 
-              type="number" 
-              required
-              value={formData.timeline.value}
-              onChange={(e) => setFormData({...formData, timeline: {...formData.timeline, value: Math.max(0, Number(e.target.value))}})}
-              className={timelineInputClass(formData.timeline.value)} 
-            />
-            <div className="flex bg-[#262626] p-1 rounded-xl border border-white/5 flex-1 gap-1">
-              {["weeks", "months"].map((u) => (
-                <button
-                  key={u}
-                  onClick={() => setFormData({...formData, timeline: {...formData.timeline, unit: u}})}
-                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all capitalize ${
-                    formData.timeline.unit === u ? "bg-gradient-to-r from-violet-600 to-purple-400 text-white" : "text-gray-500"
-                  }`}
-                >{u}</button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* 4. SPECIFIC TOPICS */}
+        {/* 3. SPECIFIC TOPICS */}
         <section className="bg-[#1a1a1a] border border-white/10 rounded-2xl p-8 space-y-6">
           <div className="flex items-center gap-2 text-yellow-400">
             <Lightbulb size={22} />

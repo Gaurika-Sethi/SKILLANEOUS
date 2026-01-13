@@ -30,7 +30,7 @@ export default function FeaturesPage() {
           }
           50% {
             /* Bright state */
-            border-color: rgba(236, 72, 153, 0.5); /* Pink border tint */
+            border-color: rgba(245, 35, 199, 0.6); /* Pink border tint */
             box-shadow: 0 0 60px rgba(236, 72, 153, 0.25); /* Soft pink glow */
             filter: brightness(1.15); /* Overall brightness peaks */
           }
@@ -152,7 +152,7 @@ export default function FeaturesPage() {
             </div>
             <div className="flex justify-center items-center">
                 {/* The Card with the new Dim/Bright Animation Class */}
-                <div className="relative w-full max-w-md aspect-[3/4] rounded-[2.5rem] border border-white/10 bg-[#0f0f12] p-10 animate-neon-pulse">
+                <div className="relative w-full max-w-md aspect-[3/4] rounded-[2.5rem] border border-white/10 bg-[#0f0f12] p-10 animate-neon-pulse ease-in-out">
                     <div className="absolute top-8 right-8 bg-pink-500/20 text-pink-400 text-[10px] px-3 py-1 rounded-full border border-pink-500/30 font-black tracking-widest shadow-lg shadow-pink-500/10">
                         AI-POWERED
                     </div>
