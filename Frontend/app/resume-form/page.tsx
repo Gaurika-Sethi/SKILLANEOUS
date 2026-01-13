@@ -189,7 +189,7 @@ export default function ResumeForm() {
             </div>
             
             <div className="md:col-span-2 space-y-2">
-              <label className="text-sm font-medium text-gray-300">Photo (Optional) {isPhotoRequired && <span className="text-pink-500">*</span>}</label>
+              <label className="text-sm font-medium text-gray-300">Photo{isPhotoRequired && <span className="text-pink-500">*</span>}</label>
               <label className={`flex items-center gap-2 w-fit bg-[#262626] border rounded-xl px-4 py-2.5 cursor-pointer hover:bg-[#323232] transition text-sm ${isPhotoRequired && !photo && showErrors ? "border-red-500" : "border-white/10"}`}>
                 <Upload size={18} className="text-cyan-400" /> {photo ? photo.name : "Upload Photo"}
                 <input type="file" className="hidden" onChange={(e) => setPhoto(e.target.files?.[0] || null)} />
