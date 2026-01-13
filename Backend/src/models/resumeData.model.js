@@ -4,7 +4,8 @@ const resumeDataSchema = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
-        required: true,
+        required: false,
+        default: null,
     },
 
     personalInfo: {
@@ -107,15 +108,6 @@ const resumeDataSchema = new Schema({
         type: [String],
         default: [],
     },
-
-    expirationAt: {
-        type: Date,
-        required: true,
-        default: () => Date.now() + 1000 * 60 * 10, 
-        index: {expires: 0},
-    },
-}, {timestamps: true})
-
-resumeDataSchema.index({ expirationAt: 1 }, { expireAfterSeconds: 0 });
+}, {timestamps: true});
 
 export const ResumeData = mongoose.model("ResumeData", resumeDataSchema);

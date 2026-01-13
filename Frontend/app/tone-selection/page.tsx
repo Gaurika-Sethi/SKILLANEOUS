@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Sparkles, CheckCircle2 } from "lucide-react";
 
 const TONES = [
@@ -29,17 +29,51 @@ const TONES = [
 
 export default function ToneSelection() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const resumeDataId = searchParams.get("resumeDataId");
+  const theme = searchParams.get("theme");
+
   const [selectedTone, setSelectedTone] = useState("professional");
   const [targetRole, setTargetRole] = useState("");
 
-  const handleGenerate = () => {
-    if (!targetRole.trim()) {
-      alert("Please specify a Target Role to optimize your resume.");
-      return;
+  const handleGenerate = async () => {
+
+    if (!resumeDataId) {
+    alert("Missing resume data. Please complete the resume form first.");
+    router.push("/resume-form");
+    return;
+  }
+
+  if (!targetRole.trim()) {
+    alert("Please specify a Target Role");
+    return;
+  }
+
+  const res = await fetch(
+    "http://localhost:8000/api/v1/resume/generate-ai",
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resumeDataId,
+        templateType: theme,
+        tone: selectedTone,
+        targetRole,
+      }),
     }
-    // Proceed to final generation/preview
-    console.log("Generating with:", { selectedTone, targetRole });
-  };
+  );
+
+  if (!res.ok) {
+    alert("Failed to generate resume");
+    return;
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  window.open(url);
+
+
+};
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-20 font-sans">
@@ -109,6 +143,7 @@ export default function ToneSelection() {
           {/* Action Buttons */}
           <div className="space-y-6 pt-4">
             <button
+              type="button"
               onClick={handleGenerate}
               className="w-full py-5 bg-[#262626] border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#323232] transition-all group"
             >
@@ -119,6 +154,7 @@ export default function ToneSelection() {
             </button>
 
             <button
+              type="button"
               onClick={() => router.back()}
               className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-medium"
             >
@@ -131,3 +167,4 @@ export default function ToneSelection() {
     </div>
   );
 }
+

@@ -59,14 +59,91 @@ export default function ResumeForm() {
     return hasPersonal && hasSummary && hasSkills && hasPhoto && hasExperience && hasProjects && hasEducation;
   };
 
-  const handleGenerate = () => {
-    setShowErrors(true);
-    if (!isFormValid()) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return;
-    }
-    router.push("/tone-selection");
-  };
+  const handleGenerate = async () => {
+  console.log("🚀 Generate button clicked");
+  setShowErrors(true);
+  if (!isFormValid()) {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
+
+  const formData = new FormData();
+
+  formData.append(
+    "personalInfo",
+    JSON.stringify({
+      fullName: personal.fullName,
+      email: personal.email,
+      phone: personal.phone,
+      location: personal.location,
+      links,
+    })
+  );
+
+  formData.append("summary", summary);
+
+  formData.append(
+    "parsedSkills",
+    JSON.stringify(skills.split(",").map(s => s.trim()))
+  );
+
+  formData.append(
+    "experience",
+    JSON.stringify(
+      experiences.map(e => ({
+        role: e.role,
+        company: e.company,
+        startDate: e.startDate,
+        endDate: e.isPresent ? "Present" : e.endDate,
+        description: e.description.split("\n"),
+      }))
+    )
+  );
+
+  formData.append(
+    "projects",
+    JSON.stringify(
+      projects.map(p => ({
+        title: p.title,
+        techStack: p.techStack.split(","),
+        duration: p.duration,
+        description: p.description.split("\n"),
+        links: [{ type: p.linkType, url: p.linkUrl }],
+      }))
+    )
+  );
+
+  formData.append("education", JSON.stringify(education));
+
+  formData.append(
+    "achievements",
+    JSON.stringify(
+      achievements.split("\n").map(a => a.trim()).filter(Boolean)
+    )
+  );
+
+  if (photo) {
+    formData.append("photo", photo);
+  }
+
+  const res = await fetch("http://localhost:8000/api/v1/resume/create-data", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    alert(data.message || "Failed to save resume data");
+    return;
+  }
+
+  const resumeDataId = data.data._id;
+
+  router.push(
+    `/tone-selection?resumeDataId=${resumeDataId}&theme=${theme}`
+  );
+};
 
   const inputClass = (value: string) => `w-full bg-[#262626] border rounded-xl px-4 py-3 focus:outline-none transition-colors ${
     isMissing(value) ? "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.1)]" : "border-white/5 focus:border-purple-500/50"
@@ -262,11 +339,16 @@ export default function ResumeForm() {
           <textarea placeholder="Notable accomplishments..." rows={4} value={achievements} onChange={(e) => setAchievements(e.target.value)} className="w-full bg-[#262626] border border-white/5 rounded-xl px-4 py-3 focus:outline-none resize-none" />
         </section>
 
-        <div className="pt-6">
-          <button onClick={handleGenerate} className="w-full px-10 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/5">
-            Generate Resume
-          </button>
-        </div>
+        <section className="sticky bottom-0 bg-black pt-6 pb-10 z-50">
+  <button
+    type="button"
+    onClick={handleGenerate}
+    className="w-full px-10 py-4 bg-white text-black font-bold rounded-xl hover:bg-gray-200 transition-all active:scale-95 shadow-lg shadow-white/5"
+  >
+    Generate Resume
+  </button>
+</section>
+
       </div>
     </div>
   );

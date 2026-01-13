@@ -7,8 +7,16 @@ import { generateResume } from "../controllers/generatedResume.controller.js";
 const router = Router();
 
 // Route to submit resume data with photo upload
-router.post("/create-data", verifyJWT, upload.single("photo"), createResumeData);
+router.post("/create-data", upload.single("photo"), createResumeData);
 
-router.post("/generate-ai", verifyJWT, generateResume);
+router.post(
+  "/generate-ai",
+  (req, res, next) => {
+    console.log("🔥 /generate-ai HIT");
+    next(); // 👈 THIS is the key
+  },
+  generateResume
+);
+
 
 export default router;

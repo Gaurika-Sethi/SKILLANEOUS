@@ -6,7 +6,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 
 // Submit resume data
 const createResumeData = asyncHandler(async (req, res) => {
-    const userId = req.user._id;
+    const userId = null;
 
     let photoUrl = "";
 
