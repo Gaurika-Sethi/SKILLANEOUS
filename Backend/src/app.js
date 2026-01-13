@@ -20,6 +20,8 @@ app.use('/api/v1/users', userRoutes);
 import resumeRoutes from './routes/resume.routes.js';
 app.use('/api/v1/resume', resumeRoutes);
 
+import roadmapRoutes from './routes/roadmap.routes.js';
+app.use('/api/v1/roadmap', roadmapRoutes);
 
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
