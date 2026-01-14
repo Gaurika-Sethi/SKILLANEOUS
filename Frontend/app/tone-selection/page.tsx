@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ChevronLeft, Sparkles, CheckCircle2 } from "lucide-react";
+import { ChevronLeft, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 
 const TONES = [
   {
@@ -35,6 +35,8 @@ export default function ToneSelection() {
 
   const [selectedTone, setSelectedTone] = useState("professional");
   const [targetRole, setTargetRole] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleGenerate = async () => {
 
@@ -49,30 +51,42 @@ export default function ToneSelection() {
     return;
   }
 
-  const res = await fetch(
-    "http://localhost:8000/api/v1/resume/generate-ai",
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        resumeDataId,
-        templateType: theme,
-        tone: selectedTone,
-        targetRole,
-      }),
+  setIsGenerating(true);
+  setIsSuccess(false);
+
+  try {
+    const res = await fetch(
+      "http://localhost:8000/api/v1/resume/generate-ai",
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          resumeDataId,
+          templateType: theme,
+          tone: selectedTone,
+          targetRole,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      alert("Failed to generate resume");
+      return;
     }
-  );
 
-  if (!res.ok) {
-    alert("Failed to generate resume");
-    return;
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    window.open(url);
+    
+    setIsSuccess(true);
+    setTimeout(() => {
+      setIsSuccess(false);
+      setIsGenerating(false);
+    }, 3000);
+  } catch (error) {
+    alert("An error occurred while generating the resume");
+    setIsGenerating(false);
   }
-
-  const blob = await res.blob();
-  const url = window.URL.createObjectURL(blob);
-  window.open(url);
-
-
 };
 
   return (
@@ -145,18 +159,38 @@ export default function ToneSelection() {
             <button
               type="button"
               onClick={handleGenerate}
-              className="w-full py-5 bg-[#262626] border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#323232] transition-all group"
+              disabled={isGenerating}
+              className="w-full py-5 bg-[#262626] border border-white/10 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-[#323232] transition-all group disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Sparkles size={20} className="text-gray-400 group-hover:text-cyan-400 transition-colors" />
-              <span className="text-gray-400 group-hover:text-white uppercase tracking-widest text-sm">
-                Generate My Resume
-              </span>
+              {isGenerating ? (
+                <>
+                  <Loader2 size={20} className="text-cyan-400 animate-spin" />
+                  <span className="text-gray-400 uppercase tracking-widest text-sm">
+                    {isSuccess ? "Resume Generated Successfully!" : "Generating Resume..."}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Sparkles size={20} className="text-gray-400 group-hover:text-cyan-400 transition-colors" />
+                  <span className="text-gray-400 group-hover:text-white uppercase tracking-widest text-sm">
+                    Generate My Resume
+                  </span>
+                </>
+              )}
             </button>
+
+            {isSuccess && (
+              <div className="flex items-center justify-center gap-2 text-green-400 text-sm font-medium animate-fade-in">
+                <CheckCircle2 size={18} />
+                <span>Resume generated successfully!</span>
+              </div>
+            )}
 
             <button
               type="button"
               onClick={() => router.back()}
-              className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-medium"
+              disabled={isGenerating}
+              className="w-full flex items-center justify-center gap-2 text-gray-500 hover:text-white transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <ChevronLeft size={18} />
               Edit Resume Details
