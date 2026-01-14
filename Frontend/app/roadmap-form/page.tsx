@@ -105,8 +105,33 @@ export default function RoadmapForm() {
     const genData = await genRes.json();
     if (!genRes.ok) throw new Error(genData.message);
 
+    function markdownToJson(markdown: string) {
+      return {
+        title: "Custom Learning Roadmap",
+        sections: markdown
+        .split("## ")
+        .slice(1)
+        .map(section => {
+          const [label, ...rest] = section.split("\n");
+          const topics = rest
+          .join("\n")
+          .split("### ")
+          .slice(1)
+          .map(topic => {
+            const [title, ...subs] = topic.split("\n");
+      return {
+        title: title.replace("Topic:", "").trim(),
+        subtopics: subs.filter(l => l.startsWith("-")).map(s => s.replace("-", "").trim())
+      };
+    });
+    
+    return { label: label.trim(), topics };
+  }),
+  };
+}
+
     // 3️⃣ Convert markdown → JSON (TEMP: mock or backend helper)
-    const roadmapJson = convertMarkdownToJson(genData.data.markdown);
+    const roadmapJson = markdownToJson(genData.data.markdown);
 
     // 4️⃣ Store for RoadmapPage
     sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapJson));
