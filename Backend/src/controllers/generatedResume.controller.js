@@ -3,7 +3,7 @@ import { GeneratedResume } from "../models/generatedResume.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { buildResumeGenerationPrompt } from "../utils/resumePrompt.js";
-import { generateResumeFromAI } from "../utils/ai.js";
+import { generateFromAI } from "../utils/ai.js";
 import { safeJsonParse } from "../utils/json.js";
 
 import { normalizeGeneratedResumeContent } from "../utils/normalizeGeneratedResume.js";
@@ -34,7 +34,7 @@ const generateResume = asyncHandler(async (req, res) => {
         console.log("Calling AI");
         const model = "gpt-4o-mini";
     
-        const aiRaw = await generateResumeFromAI({
+        const aiRaw = await generateFromAI({
             prompt,
             model,
             temperature: 0.2,

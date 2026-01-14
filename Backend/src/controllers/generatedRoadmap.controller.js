@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { RoadmapRequest } from "../models/roadmapRequest.model.js";
 import { GeneratedRoadmap } from "../models/generatedRoadmap.model.js";
-import { generateRoadmapFromAI } from "../utils/ai.js";
+import { generateFromAI } from "../utils/ai.js";
 import { buildRoadmapPrompt } from "../utils/roadmapPrompt.js";
 
 const generateRoadmap = asyncHandler(async (req, res) => {
@@ -29,7 +29,7 @@ const generateRoadmap = asyncHandler(async (req, res) => {
   });
 
   /* 3️⃣ Call AI */
-  const aiRaw = await generateRoadmapFromAI({
+  const aiRaw = await generateFromAI({
     prompt,
     model: "gpt-4o-mini",
     temperature: 0.3,
