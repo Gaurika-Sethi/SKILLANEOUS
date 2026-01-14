@@ -63,6 +63,60 @@ export default function RoadmapForm() {
   );
 };
 
+    function markdownToJson(markdown: string) {
+  const lines = markdown.split("\n");
+
+  const title = lines[0].replace("#", "").trim();
+
+  const sections: any[] = [];
+
+  let currentSection: any = null;
+  let currentTopic: any = null;
+
+  for (const line of lines) {
+    // ## Phase
+    if (line.startsWith("## ")) {
+      if (currentSection) {
+        sections.push(currentSection);
+      }
+
+      currentSection = {
+        label: line.replace("##", "").trim(),
+        topics: [],
+      };
+      currentTopic = null;
+    }
+
+    // ### Topic
+    else if (line.startsWith("### ")) {
+      currentTopic = {
+        title: line.replace("###", "").trim(),
+        subtopics: [],
+      };
+      currentSection.topics.push(currentTopic);
+    }
+
+    // - Subtopic
+    else if (line.startsWith("- ")) {
+      if (currentTopic) {
+        currentTopic.subtopics.push(
+          line.replace("- ", "").trim()
+        );
+      }
+    }
+  }
+
+  // push last section
+  if (currentSection) {
+    sections.push(currentSection);
+  }
+
+  return {
+    title,
+    sections,
+  };
+}
+
 
   const handleSubmitRoadmap = async () => {
   setShowErrors(true);
@@ -85,59 +139,68 @@ export default function RoadmapForm() {
   try {
     // 1️⃣ Create roadmap request
     const reqRes = await fetch("http://localhost:8000/api/v1/roadmap/create-data", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(payload),
+});
 
-    const reqData = await reqRes.json();
-    if (!reqRes.ok) throw new Error(reqData.message);
+const reqText = await reqRes.text();
+console.log("CREATE-DATA RAW:", reqText);
 
-    const roadmapRequestId = reqData.data._id;
+let reqData;
+try {
+  reqData = JSON.parse(reqText);
+} catch {
+  throw new Error("Create-data did not return JSON");
+}
+
+if (!reqRes.ok) {
+  throw new Error(reqData.message || "Create roadmap request failed");
+}
+
+const roadmapRequestId = reqData?.data?._id;
+
+if (!roadmapRequestId) {
+  throw new Error("roadmapRequestId missing from response");
+}
 
     // 2️⃣ Generate roadmap (AI)
     const genRes = await fetch("http://localhost:8000/api/v1/roadmap/generate-roadmap", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ roadmapRequestId }),
-    });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ roadmapRequestId }),
+});
 
-    const genData = await genRes.json();
-    if (!genRes.ok) throw new Error(genData.message);
+const genText = await genRes.text();
+console.log("GENERATE RAW:", genText);
 
-    function markdownToJson(markdown: string) {
-      return {
-        title: "Custom Learning Roadmap",
-        sections: markdown
-        .split("## ")
-        .slice(1)
-        .map(section => {
-          const [label, ...rest] = section.split("\n");
-          const topics = rest
-          .join("\n")
-          .split("### ")
-          .slice(1)
-          .map(topic => {
-            const [title, ...subs] = topic.split("\n");
-      return {
-        title: title.replace("Topic:", "").trim(),
-        subtopics: subs.filter(l => l.startsWith("-")).map(s => s.replace("-", "").trim())
-      };
-    });
-    
-    return { label: label.trim(), topics };
-  }),
-  };
+let genData;
+try {
+  genData = JSON.parse(genText);
+} catch {
+  throw new Error("Generate-roadmap did not return JSON");
 }
 
-    // 3️⃣ Convert markdown → JSON (TEMP: mock or backend helper)
-    const roadmapJson = markdownToJson(genData.data.markdown);
+if (!genRes.ok) {
+  throw new Error(genData.message || "Failed to generate roadmap");
+}
 
-    // 4️⃣ Store for RoadmapPage
+if (!genData?.data?.markdown) {
+  throw new Error("Markdown missing in AI response");
+}
+
+    let roadmapJson;
+    try{
+      roadmapJson = markdownToJson(genData.data.markdown);
+    } catch {
+      throw new Error("Failed to convert markdown to JSON");
+    }
+
+    console.log("🚀 ROADMAP JSON:", roadmapJson);
     sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapJson));
 
     // 5️⃣ Navigate
-    router.push(`/roadmap?visibility=${formData.visibility}`);
+    router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
   } catch (err) {
     console.error(err);
     alert("Server error while creating roadmap");
