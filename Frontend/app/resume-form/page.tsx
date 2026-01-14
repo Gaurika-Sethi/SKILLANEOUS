@@ -37,7 +37,7 @@ export default function ResumeForm() {
   const [summary, setSummary] = useState("");
   const [skills, setSkills] = useState("");
   const [experiences, setExperiences] = useState<Experience[]>([{ role: "", company: "", startDate: "", endDate: "", isPresent: false, description: "" }]);
-  const [projects, setProjects] = useState<Project[]>([{ title: "", techStack: "", duration: "", description: "", linkType: "GitHub", linkUrl: "" }]);
+  const [projects, setProjects] = useState<Project[]>([{ title: "", techStack: "", duration: "", description: "", linkType: "github", linkUrl: "" }]);
   const [education, setEducation] = useState({ institution: "", degree: "", location: "", graduationYear: "" });
   const [achievements, setAchievements] = useState("");
 

@@ -51,10 +51,10 @@ const ThemeSelection = () => {
 
         {/* Theme Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {themes.map((theme) => (
+          {themes.map((theme: typeof themes[0]) => (
             <div
               key={theme.id}
-              onClick={() => setSelectedTheme(theme.id)}
+              onClick={() => setSelectedTheme(theme.id as "creative" | "modern" | "ats")}
               className={`relative cursor-pointer group p-8 rounded-[32px] bg-[#111116] border-2 transition-all duration-300 flex flex-col h-full ${
                 selectedTheme === theme.id 
                 ? theme.activeColor 
