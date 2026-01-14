@@ -1,4 +1,4 @@
-
+import { generateRoadmapFromAI } from "./ai.js";
 
 const generatePhaseDetailsFromAI = async ({
   roadmapMarkdown,
@@ -32,7 +32,7 @@ Rules:
 - Valid JSON only
 `;
 
-  const response = await generateResumeFromAI({
+  const response = await generateRoadmapFromAI({
     prompt,
     model: "gpt-4o-mini",
     temperature: 0.3,

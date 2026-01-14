@@ -13,15 +13,15 @@ const generatedRoadmapSchema = new mongoose.Schema(
       required: true,
     },
 
-    markdown: {
-      type: String,
-      required: true,
-    },
-
     visibility: {
       type: String,
       enum: ["public", "private"],
       default: "private",
+    },
+
+    structured: {
+      type: mongoose.Schema.Types.Mixed, 
+      required: true,
     },
 
     ai_metadata: {

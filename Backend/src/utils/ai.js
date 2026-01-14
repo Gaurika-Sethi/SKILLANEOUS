@@ -41,3 +41,28 @@ const generateResumeFromAI = async ({
 };
 
 export { generateResumeFromAI };
+
+
+import dotenv from "dotenv";
+
+dotenv.config();
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+// ✅ Reusable AI helper for both resume & roadmap
+
+async function generateRoadmapFromAI({ prompt, model, temperature }) {
+  try {
+    const response = await openai.chat.completions.create({
+      model,
+      temperature,
+      messages: [{ role: "user", content: prompt }],
+    });
+
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    console.error("❌ OpenAI API error:", error);
+    throw new Error("AI generation failed");
+  }
+}
+
+export { generateRoadmapFromAI };
