@@ -63,59 +63,7 @@ export default function RoadmapForm() {
   );
 };
 
-    function markdownToJson(markdown: string) {
-  const lines = markdown.split("\n");
 
-  const title = lines[0].replace("#", "").trim();
-
-  const sections: any[] = [];
-
-  let currentSection: any = null;
-  let currentTopic: any = null;
-
-  for (const line of lines) {
-    // ## Phase
-    if (line.startsWith("## ")) {
-      if (currentSection) {
-        sections.push(currentSection);
-      }
-
-      currentSection = {
-        label: line.replace("##", "").trim(),
-        topics: [],
-      };
-      currentTopic = null;
-    }
-
-    // ### Topic
-    else if (line.startsWith("### ")) {
-      currentTopic = {
-        title: line.replace("###", "").trim(),
-        subtopics: [],
-      };
-      currentSection.topics.push(currentTopic);
-    }
-
-    // - Subtopic
-    else if (line.startsWith("- ")) {
-      if (currentTopic) {
-        currentTopic.subtopics.push(
-          line.replace("- ", "").trim()
-        );
-      }
-    }
-  }
-
-  // push last section
-  if (currentSection) {
-    sections.push(currentSection);
-  }
-
-  return {
-    title,
-    sections,
-  };
-}
 
 
   const handleSubmitRoadmap = async () => {
@@ -185,22 +133,28 @@ if (!genRes.ok) {
   throw new Error(genData.message || "Failed to generate roadmap");
 }
 
-if (!genData?.data?.markdown) {
-  throw new Error("Markdown missing in AI response");
+// 3️⃣ Validate roadmap structure from AI
+const roadmapJson = genData?.data;
+
+if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
+  throw new Error("Invalid roadmap JSON structure - missing title or phases");
 }
 
-    let roadmapJson;
-    try{
-      roadmapJson = markdownToJson(genData.data.markdown);
-    } catch {
-      throw new Error("Failed to convert markdown to JSON");
-    }
+// 4️⃣ Convert backend format (phases) to frontend format (sections)
+const roadmapForDisplay = {
+  title: roadmapJson.title,
+  sections: roadmapJson.phases.map((phase: any) => ({
+    id: phase.id,
+    label: phase.label,
+    topics: phase.topics || [],
+  })),
+};
 
-    console.log("🚀 ROADMAP JSON:", roadmapJson);
-    sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapJson));
+console.log("🚀 ROADMAP JSON:", roadmapForDisplay);
+sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
 
-    // 5️⃣ Navigate
-    router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
+// 5️⃣ Navigate
+router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
   } catch (err) {
     console.error(err);
     alert("Server error while creating roadmap");
