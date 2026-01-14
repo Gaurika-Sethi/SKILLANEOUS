@@ -56,13 +56,69 @@ export default function RoadmapForm() {
   };
 
   const isFormValid = () => {
-    return (
-      formData.fieldToWorkIn.trim() !== "" &&
-      formData.purpose.trim() !== "" &&
-      formData.timeline.value > 0 &&
-      (formData.visibility === "public" || formData.visibility === "private")
-    );
+  return (
+    formData.fieldToWorkIn.trim() !== "" &&
+    formData.purpose.trim() !== "" &&
+    (formData.visibility === "public" || formData.visibility === "private")
+  );
+};
+
+
+  const handleSubmitRoadmap = async () => {
+  setShowErrors(true);
+  if (!isFormValid()) return;
+
+  const payload = {
+    targetField: formData.fieldToWorkIn,
+    primaryPurpose: formData.purpose,
+    skills: existingSkills
+      .filter(s => s.skill.trim())
+      .map(s => ({
+        name: s.skill,
+        years: Number(s.years),
+        level: s.level,
+      })),
+    specificFocus: formData.whatToLearn,
+    visibility: formData.visibility,
   };
+
+  try {
+    // 1️⃣ Create roadmap request
+    const reqRes = await fetch("http://localhost:8000/api/v1/roadmap/create-data", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const reqData = await reqRes.json();
+    if (!reqRes.ok) throw new Error(reqData.message);
+
+    const roadmapRequestId = reqData.data._id;
+
+    // 2️⃣ Generate roadmap (AI)
+    const genRes = await fetch("http://localhost:8000/api/v1/roadmap/generate-roadmap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roadmapRequestId }),
+    });
+
+    const genData = await genRes.json();
+    if (!genRes.ok) throw new Error(genData.message);
+
+    // 3️⃣ Convert markdown → JSON (TEMP: mock or backend helper)
+    const roadmapJson = convertMarkdownToJson(genData.data.markdown);
+
+    // 4️⃣ Store for RoadmapPage
+    sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapJson));
+
+    // 5️⃣ Navigate
+    router.push(`/roadmap?visibility=${formData.visibility}`);
+  } catch (err) {
+    console.error(err);
+    alert("Server error while creating roadmap");
+  }
+};
+
 
   const inputClass = (value: any) => `w-full bg-[#262626] border rounded-xl px-4 py-3 focus:outline-none transition-colors ${
     showErrors && (value === "" || value === undefined) 
@@ -172,6 +228,7 @@ export default function RoadmapForm() {
                   <label className="text-[10px] font-bold text-gray-500 uppercase">Proficiency</label>
                   <div className="flex bg-[#121212] p-1 rounded-lg border border-white/10 gap-1">
                     <button
+                      type="button"
                       onClick={() => { const n = [...existingSkills]; n[index].level = "beginner"; setExistingSkills(n); }}
                       className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all capitalize ${
                         s.level === "beginner" ? "bg-gradient-to-r from-cyan-600 to-cyan-400 text-white shadow-lg shadow-cyan-500/20" : "text-gray-500"
@@ -179,6 +236,7 @@ export default function RoadmapForm() {
                     >Beginner</button>
                     
                     <button
+                      type="button"
                       onClick={() => { const n = [...existingSkills]; n[index].level = "intermediate"; setExistingSkills(n); }}
                       className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all capitalize ${
                         s.level === "intermediate" ? "bg-gradient-to-r from-purple-600 to-purple-400 text-white shadow-lg shadow-purple-500/20" : "text-gray-500"
@@ -186,6 +244,7 @@ export default function RoadmapForm() {
                     >Intermediate</button>
 
                     <button
+                      type="button"
                       onClick={() => { const n = [...existingSkills]; n[index].level = "advanced"; setExistingSkills(n); }}
                       className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all capitalize ${
                         s.level === "advanced" ? "bg-gradient-to-r from-pink-600 to-pink-400 text-white shadow-lg shadow-pink-500/20" : "text-gray-500"
@@ -203,7 +262,7 @@ export default function RoadmapForm() {
                 </div>
               </div>
             ))}
-            <button onClick={addSkill} className="flex items-center gap-2 text-cyan-400 text-sm font-bold hover:text-cyan-300 px-1"><Plus size={20} /> ADD ANOTHER SKILL</button>
+            <button type="button" onClick={addSkill} className="flex items-center gap-2 text-cyan-400 text-sm font-bold hover:text-cyan-300 px-1"><Plus size={20} /> ADD ANOTHER SKILL</button>
           </div>
         </section>
         {/* 3. SPECIFIC TOPICS */}
@@ -229,6 +288,7 @@ export default function RoadmapForm() {
           </div>
           <div className="flex bg-[#262626] p-1 rounded-xl border border-white/5 max-w-md gap-1">
             <button
+              type="button"
               onClick={() => setFormData({...formData, visibility: "public"})}
               className={`flex-1 py-3 px-6 text-sm font-bold rounded-lg transition-all capitalize flex items-center justify-center gap-2 ${
                 formData.visibility === "public" ? "bg-gradient-to-r from-indigo-400 to-cyan-600 text-white shadow-lg shadow-emerald-500/20" : "text-gray-500"
@@ -239,6 +299,7 @@ export default function RoadmapForm() {
             </button>
             
             <button
+              type="button"
               onClick={() => setFormData({...formData, visibility: "private"})}
               className={`flex-1 py-3 px-6 text-sm font-bold rounded-lg transition-all capitalize flex items-center justify-center gap-2 ${
                 formData.visibility === "private" ? "bg-gradient-to-r from-pink-600 to-purple-400 text-white shadow-lg shadow-slate-500/20" : "text-gray-500"
@@ -257,12 +318,8 @@ export default function RoadmapForm() {
 
         <div className="pt-6">
           <button 
-            onClick={() => { 
-              setShowErrors(true); 
-              if(isFormValid()) {
-                router.push(`/roadmap?visibility=${formData.visibility}`);
-              }
-            }}
+            type="button"
+            onClick={handleSubmitRoadmap}
             className="w-full flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.97] shadow-2xl shadow-purple-500/20"
           >
             GENERATE CUSTOM ROADMAP <ChevronRight size={24} />

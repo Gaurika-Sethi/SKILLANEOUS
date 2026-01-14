@@ -107,6 +107,7 @@ export default function RoadmapView({ roadmap, visibility = "public" }: { roadma
               <div className="absolute top-full mt-2 right-0 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden shadow-xl z-50 min-w-[120px]">
                 {["png", "jpg", "pdf"].map((format) => (
                   <button
+                    type="button"
                     key={format}
                     onClick={() => {
                       setSelectedFormat(format as "png" | "jpg" | "pdf");
