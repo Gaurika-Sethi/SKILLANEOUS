@@ -30,7 +30,6 @@ export default function RoadmapsPage() {
     { level: "Advanced", title: "DevOps Engineer", desc: "Master CI/CD, infrastructure automation, and cloud platforms", tags: ['AWS', 'Terraform', 'Jenkins'], duration: "6 months", students: "1,654", color: "purple", role: "DevOps Engineer" },
     { level: "Intermediate", title: "AI Product Manager", desc: "Lead AI product development from ideation to deployment", tags: ['Product Strategy', 'AI/ML', 'Agile'], duration: "3 months", students: "987", color: "cyan", role: "Product Manager" },
   ];
-
   // Filter logic
   const getDurationCategory = (durationStr: string) => {
     const months = parseInt(durationStr);
@@ -290,20 +289,7 @@ function RoadmapCard({ level, title, desc, tags, duration, students, color, crea
       </div>
 
       {/* Content */}
-      <h3 
-        className="text-xl font-bold mb-3 transition-colors"
-        style={{
-          color: '#9ca3af',
-        }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLElement).style.color = styles.borderColor;
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLElement).style.color = '#9ca3af';
-        }}
-      >
-        {title}
-      </h3>
+      <h3 className="text-xl font-bold mb-3 group-hover:text-cyan-400 transition-colors">{title}</h3>
       <p className="text-gray-500 text-sm leading-relaxed mb-6 line-clamp-2">
         {desc}
       </p>

@@ -171,12 +171,12 @@ export default function RoadmapView({ roadmap, visibility = "public" }: { roadma
             
             {/* Final Milestone Indicator */}
             <div className="relative pl-14 pt-4">
-               <div className="absolute left-0 top-1/2 -translate-y-1/2 flex items-center justify-center">
-                  <div className="z-10 w-10 h-10 rounded-full bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <Trophy size={20} className="text-black" />
+               <div className="absolute left-0 right-207 top-1/2 -translate-y-1/2 flex items-center justify-center">
+                  <div className="z-10 w-15 h-15 rounded-full bg-gradient-to-tr from-yellow-300 via-orange-400 to-red-600 flex items-center justify-center shadow-lg shadow-orange-400/30">
+                    <Trophy size={40} className="text-black" />
                   </div>
                </div>
-               <h3 className="text-xl font-bold text-white/40 italic">Path Completed</h3>
+               <h3 className="pl-6 pb-3 text-2xl font-bold text-white/90 underline underline-offset-6">Path Completed</h3>
             </div>
           </div>
         </div>
