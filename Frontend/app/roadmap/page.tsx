@@ -22,11 +22,27 @@ export default function RoadmapPage() {
     }
 
     try {
-      setRoadmap(JSON.parse(stored));
+      const parsed = JSON.parse(stored);
+
+      // ✅ try to get roadmapRequestId from storage or from parsed object
+      const roadmapRequestId =
+        parsed?.roadmapRequestId ||
+        sessionStorage.getItem("roadmapRequestId") ||
+        sessionStorage.getItem("roadmapRequestId_json");
+
+      if (!roadmapRequestId) {
+        console.warn("⚠️ roadmapRequestId not found in sessionStorage or roadmap_json");
+      }
+
+      // ✅ attach it so RoadmapView can call topic-summary API
+      setRoadmap({
+        ...parsed,
+        roadmapRequestId: roadmapRequestId || parsed?.roadmapRequestId,
+      });
     } catch {
       setError("Invalid roadmap data.");
     }
-  }, []); // ✅ dependency array is now STABLE
+  }, []);
 
   if (error) {
     return (

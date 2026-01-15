@@ -143,6 +143,7 @@ if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
 // 4️⃣ Convert backend format (phases) to frontend format (sections)
 const roadmapForDisplay = {
   title: roadmapJson.title,
+  roadmapRequestId, // ✅ IMPORTANT ADD THIS
   sections: roadmapJson.phases.map((phase: any) => ({
     id: phase.id,
     label: phase.label,
@@ -150,8 +151,10 @@ const roadmapForDisplay = {
   })),
 };
 
+
 console.log("🚀 ROADMAP JSON:", roadmapForDisplay);
 sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
+sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
 
 // 5️⃣ Navigate
 router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
