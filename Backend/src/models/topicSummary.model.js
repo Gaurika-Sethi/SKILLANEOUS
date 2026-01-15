@@ -1,40 +1,31 @@
 import mongoose from "mongoose";
 
-const phaseDetailSchema = new mongoose.Schema(
+const topicSummarySchema = new mongoose.Schema(
   {
     roadmapRequestId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "GeneratedRoadmap",
       required: true,
+      index: true,
     },
-
     phaseId: {
       type: String,
       required: true,
+      index: true,
     },
-
-    title: {
+    topicId: {
+      type: String,
+      required: true,
+      index: true,
+    },
+    topicTitle: {
       type: String,
       required: true,
     },
-
     summary: {
       type: String,
       required: true,
     },
-
-    resources: [
-      {
-        type: {
-          type: String, 
-          enum: ["article", "video", "docs"],
-          required: true,
-        },
-        title: String,
-        url: String,
-      },
-    ],
-
     ai_metadata: {
       provider: String,
       model: String,
@@ -45,9 +36,9 @@ const phaseDetailSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-phaseDetailSchema.index({ roadmapRequestId: 1, phaseId: 1 }, { unique: true });
-
-export const PhaseDetail = mongoose.model(
-  "PhaseDetail",
-  phaseDetailSchema
+topicSummarySchema.index(
+  { roadmapRequestId: 1, phaseId: 1, topicId: 1 },
+  { unique: true }
 );
+
+export const TopicSummary = mongoose.model("TopicSummary", topicSummarySchema);

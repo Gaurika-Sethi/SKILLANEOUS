@@ -38,18 +38,9 @@ RULES:
 SCHEMA:
 {
   "title": string,
-  "whyItMatters": string,
-  "explanation": string,
-  "keyConcepts": string[],
-  "stepsToLearn": string[],
-  "commonMistakes": string[],
-  "miniProject": {
-    "title": string,
-    "description": string,
-    "deliverables": string[]
-  },
+  "summary": string,
   "resources": [
-    { "title": string, "url": string, "type": "article" | "video" | "course" | "docs" }
+    { "title": string, "url": string, "type": "article" | "video" | "docs" }
   ]
 }
 
@@ -90,25 +81,18 @@ Return ONLY the JSON object.
 
 if (
   !isValidString(parsed.title, 3) ||
-  !isValidString(parsed.whyItMatters, 20) ||
-  !isValidString(parsed.explanation, 40)
+  !isValidString(parsed.summary, 20)
 ) {
   console.error("❌ INVALID SUBTOPIC FIELDS:", {
     title: parsed.title,
-    whyItMatters: parsed.whyItMatters,
-    explanation: parsed.explanation,
+    summary: parsed.summary,
   });
   throw new ApiError(500, "AI returned incomplete subtopic details");
 }
 
   return {
     title: parsed.title,
-    whyItMatters: parsed.whyItMatters,
-    explanation: parsed.explanation,
-    keyConcepts: Array.isArray(parsed.keyConcepts) ? parsed.keyConcepts : [],
-    stepsToLearn: Array.isArray(parsed.stepsToLearn) ? parsed.stepsToLearn : [],
-    commonMistakes: Array.isArray(parsed.commonMistakes) ? parsed.commonMistakes : [],
-    miniProject: parsed.miniProject || { title: "", description: "", deliverables: [] },
+    summary: parsed.summary,
     resources: Array.isArray(parsed.resources) ? parsed.resources : [],
   };
 };

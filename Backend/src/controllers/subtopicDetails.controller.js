@@ -5,18 +5,26 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { generateSubtopicDetailsFromAI } from "../utils/subtopicAI.js";
 
 const getSubtopicDetails = asyncHandler(async (req, res) => {
-    
-  const { roadmapRequestId, phaseId, topicTitle, subtopicTitle } = req.body || {};
+  const { roadmapRequestId, phaseId, topicId, subtopicId } = req.body || {};
 
-  if (!roadmapRequestId || !phaseId || !topicTitle || !subtopicTitle) {
-    throw new ApiError(400, "roadmapRequestId, phaseId, topicTitle, subtopicTitle are required");
+  if (!roadmapRequestId || !phaseId || !topicId || !subtopicId) {
+    throw new ApiError(
+      400,
+      "roadmapRequestId, phaseId, topicId, subtopicId are required"
+    );
   }
+
   console.log("HEADERS:", req.headers["content-type"]);
   console.log("BODY:", req.body);
 
-
   // ✅ 1) cache
-  const cached = await SubtopicDetail.findOne({ roadmapRequestId, phaseId, topicTitle, subtopicTitle });
+  const cached = await SubtopicDetail.findOne({
+    roadmapRequestId,
+    phaseId,
+    topicId,
+    subtopicId,
+  });
+
   if (cached) {
     return res.status(200).json({ success: true, data: cached });
   }
@@ -39,21 +47,41 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Invalid roadmap structure");
   }
 
-  // ✅ 3) locate phase + topic
+  // ✅ 3) locate phase
   const phase = structured.phases.find((p) => p.id === phaseId);
-  if (!phase) throw new ApiError(404, `Phase ${phaseId} not found`);
+  if (!phase) throw new ApiError(404, `Phase '${phaseId}' not found`);
 
   const phaseLabel = phase.label || phase.title || phase.name || phaseId;
 
-  const topic = (phase.topics || []).find((t) => t.title === topicTitle);
-  if (!topic) throw new ApiError(404, `Topic '${topicTitle}' not found`);
+  // ✅ 4) locate topic using topicId
+  const topic = (phase.topics || []).find((t) => t.id === topicId);
+  if (!topic) throw new ApiError(404, `Topic '${topicId}' not found in phase '${phaseId}'`);
 
-  // ensure subtopic exists
-  const allSubtopicsInTopic = Array.isArray(topic.subtopics) ? topic.subtopics : [];
-  const exists = allSubtopicsInTopic.includes(subtopicTitle);
-  if (!exists) throw new ApiError(404, `Subtopic '${subtopicTitle}' not found under '${topicTitle}'`);
+  const topicTitle = topic.title || "Topic";
 
-  // ✅ 4) AI generate
+  // ✅ 5) locate subtopic using subtopicId
+  const subtopicsArray = Array.isArray(topic.subtopics) ? topic.subtopics : [];
+
+  const subtopicObj = subtopicsArray.find((s) => {
+    if (typeof s === "string") return false; // roadmap should now be object-based, but safe check
+    return s.id === subtopicId;
+  });
+
+  if (!subtopicObj) {
+    throw new ApiError(
+      404,
+      `Subtopic '${subtopicId}' not found under topic '${topicTitle}'`
+    );
+  }
+
+  const subtopicTitle = subtopicObj.title;
+
+  // helpful for AI prompt
+  const allSubtopicsInTopic = subtopicsArray.map((s) =>
+    typeof s === "string" ? s : s.title
+  );
+
+  // ✅ 6) AI generate
   const ai = await generateSubtopicDetailsFromAI({
     roadmapTitle: structured.title || "Learning Roadmap",
     phaseLabel,
@@ -62,20 +90,26 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
     allSubtopicsInTopic,
   });
 
-  // ✅ 5) upsert (safe)
+  // ✅ 7) upsert (safe)
   const saved = await SubtopicDetail.findOneAndUpdate(
-    { roadmapRequestId, phaseId, topicTitle, subtopicTitle },
+    { roadmapRequestId, phaseId, topicId, subtopicId },
     {
       roadmapRequestId,
       phaseId,
+      topicId,
+      subtopicId,
+
+      // store titles too for display/search/debug
       topicTitle,
       subtopicTitle,
+
       ...ai,
+
       ai_metadata: {
         provider: "openai",
         model: "gpt-4o-mini",
         temperature: 0.3,
-        prompt_version: "v1-json-subtopic",
+        prompt_version: "v2-json-subtopic",
       },
     },
     { upsert: true, new: true }

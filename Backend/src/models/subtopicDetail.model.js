@@ -15,6 +15,17 @@ const subtopicDetailSchema = new mongoose.Schema(
       index: true,
     },
 
+    topicId: { 
+      type: String, 
+      required: true, 
+      index: true },
+
+    subtopicId: { 
+      type: String, 
+      required: true, 
+      index: true 
+    },
+
     topicTitle: {
       type: String,
       required: true,
@@ -32,35 +43,9 @@ const subtopicDetailSchema = new mongoose.Schema(
       required: true,
     },
 
-    whyItMatters: {
+    summary: {
       type: String,
       required: true,
-    },
-
-    explanation: {
-      type: String,
-      required: true,
-    },
-
-    keyConcepts: {
-      type: [String],
-      default: [],
-    },
-
-    stepsToLearn: {
-      type: [String],
-      default: [],
-    },
-
-    commonMistakes: {
-      type: [String],
-      default: [],
-    },
-
-    miniProject: {
-      title: { type: String, default: "" },
-      description: { type: String, default: "" },
-      deliverables: { type: [String], default: [] },
     },
 
     resources: [
@@ -86,8 +71,9 @@ const subtopicDetailSchema = new mongoose.Schema(
 );
 
 subtopicDetailSchema.index(
-  { roadmapRequestId: 1, phaseId: 1, topicTitle: 1, subtopicTitle: 1 },
+  { roadmapRequestId: 1, phaseId: 1, topicId: 1, subtopicId: 1 },
   { unique: true }
 );
+
 
 export const SubtopicDetail = mongoose.model("SubtopicDetail", subtopicDetailSchema);
