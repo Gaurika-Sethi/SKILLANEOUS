@@ -12,7 +12,8 @@ import {
   ChevronRight,
   AlertCircle,
   Eye,
-  EyeOff
+  EyeOff,
+  Loader2
 } from "lucide-react";
 
 interface SkillEntry {
@@ -24,6 +25,7 @@ interface SkillEntry {
 export default function RoadmapForm() {
   const router = useRouter();
   const [showErrors, setShowErrors] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     fieldToWorkIn: "",
@@ -69,6 +71,8 @@ export default function RoadmapForm() {
   const handleSubmitRoadmap = async () => {
   setShowErrors(true);
   if (!isFormValid()) return;
+
+  setIsLoading(true);
 
   const payload = {
     targetField: formData.fieldToWorkIn,
@@ -160,6 +164,7 @@ sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
 router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
   } catch (err) {
     console.error(err);
+    setIsLoading(false);
     alert("Server error while creating roadmap");
   }
 };
@@ -365,9 +370,23 @@ router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData
           <button 
             type="button"
             onClick={handleSubmitRoadmap}
-            className="w-full flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-black text-lg rounded-2xl hover:opacity-90 transition-all active:scale-[0.97] shadow-2xl shadow-purple-500/20"
+            disabled={isLoading}
+            className={`w-full flex items-center justify-center gap-3 px-10 py-5 bg-gradient-to-r from-purple-600 to-cyan-600 text-white font-black text-lg rounded-2xl transition-all active:scale-[0.97] shadow-2xl shadow-purple-500/20 ${
+              isLoading 
+                ? "opacity-60 cursor-not-allowed" 
+                : "hover:opacity-90"
+            }`}
           >
-            GENERATE CUSTOM ROADMAP <ChevronRight size={24} />
+            {isLoading ? (
+              <>
+                <Loader2 size={24} className="animate-spin" />
+                GENERATING ROADMAP...
+              </>
+            ) : (
+              <>
+                GENERATE CUSTOM ROADMAP <ChevronRight size={24} />
+              </>
+            )}
           </button>
         </div>
       </div>
