@@ -47,6 +47,7 @@ Hard Rules:
 - Add a "slug" field derived from projectTitle must be lowercase, hyphen separated.
 - If deploymentPreference includes "CICD", include GitHub Actions in deploymentChecklist.
 - If githubReadmeTemplate is included, it must include an ".env.example" section.
+- If the tech stack is backend-only (Node/Express/Mongo), do NOT mention UI features like responsive design.
 - deploymentChecklist MUST follow deploymentPreference:
   - If CLOUD not selected, DO NOT mention AWS/Heroku/Vercel/Render
 - Keep output concise:

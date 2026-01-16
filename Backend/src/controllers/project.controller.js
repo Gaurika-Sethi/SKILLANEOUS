@@ -2,6 +2,8 @@ import { ProjectRequest } from "../models/projectRequest.model.js";
 import { GeneratedProject } from "../models/generatedProject.model.js";
 import { generateProjectWithAI } from "../utils/projectAI.js";
 import { sanitizeGeneratedProject } from "../utils/sanitizeGeneratedProject.js";
+import mongoose from "mongoose";
+import { ApiError } from "../utils/ApiError.js";
 
 const generateProject = async (req, res) => {
   try {
@@ -69,4 +71,62 @@ const generateProject = async (req, res) => {
   }
 };
 
-export { generateProject };
+const regenerateProject = async (req, res) => {
+  try {
+    const { requestId } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(requestId)) {
+      throw new ApiError(400, "Invalid requestId format.");
+    }
+
+    // 1) Find request
+    const requestDoc = await ProjectRequest.findById(requestId).lean();
+    if (!requestDoc) {
+      throw new ApiError(404, "ProjectRequest not found.");
+    }
+
+    // 2) Delete existing generated project (replace strategy)
+    await GeneratedProject.deleteOne({ projectRequestId: requestId });
+
+    // 3) Generate fresh output via OpenAI
+    const { generatedProject, ai_metadata } = await generateProjectWithAI({
+      targetRole: requestDoc.targetRole,
+      skillLevel: requestDoc.skillLevel,
+      learningObjective: requestDoc.learningObjective,
+      techStack: requestDoc.techStack || [],
+      outputPreference: requestDoc.outputPreference || [],
+      deploymentPreference: requestDoc.deploymentPreference || [],
+    });
+
+    // bump prompt version if you want (optional)
+    ai_metadata.prompt_version = "project-generator-v1";
+
+    // 4) Save new generated project
+    const newGeneratedDoc = await GeneratedProject.create({
+      projectRequestId: requestId,
+      ...generatedProject,
+      ai_metadata,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Project regenerated successfully.",
+      data: {
+        requestId,
+        projectId: newGeneratedDoc._id,
+        project: generatedProject, // ✅ clean object
+      },
+    });
+  } catch (error) {
+    console.error("regenerateProject error:", error);
+
+    const status = error?.statusCode || 500;
+
+    return res.status(status).json({
+      success: false,
+      message: error?.message || "Internal server error",
+    });
+  }
+};
+
+export { generateProject, regenerateProject };
