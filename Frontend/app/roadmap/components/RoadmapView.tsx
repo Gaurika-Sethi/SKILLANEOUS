@@ -10,9 +10,6 @@ import {
   Trophy,
   Download,
   AlertTriangle,
-  ChevronDown,
-  FileImage,
-  FileText,
   X,
   ExternalLink,
   BookOpen,
@@ -65,10 +62,6 @@ export default function RoadmapView({
   roadmap: Roadmap;
   visibility?: "public" | "private";
 }) {
-  const [selectedFormat, setSelectedFormat] = useState<"png" | "jpg" | "pdf">(
-    "png"
-  );
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [expandedTopics, setExpandedTopics] = useState<Set<string>>(new Set());
   const [loadingTopics, setLoadingTopics] = useState<Set<string>>(new Set());
   const [selectedSubtopic, setSelectedSubtopic] = useState<{
@@ -450,52 +443,13 @@ export default function RoadmapView({
 
         {/* Download Button Section */}
         <div className="mb-8 flex justify-end items-center gap-3">
-          {/* Format Selector */}
-          <div className="relative">
-            <button
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-              className="flex items-center gap-2 px-4 py-3 bg-[rgba(26,26,26,1)] border border-[rgba(255,255,255,0.1)] text-white font-medium rounded-xl hover:border-[rgba(255,255,255,0.2)] transition-all"
-            >
-              {selectedFormat === "png" && <FileImage size={18} />}
-              {selectedFormat === "jpg" && <FileImage size={18} />}
-              {selectedFormat === "pdf" && <FileText size={18} />}
-              <span className="uppercase text-sm">{selectedFormat}</span>
-              <ChevronDown
-                size={16}
-                className={`transition-transform ${isDropdownOpen ? "rotate-180" : ""
-                  }`}
-              />
-            </button>
-
-            {isDropdownOpen && (
-              <div className="absolute top-full mt-2 right-0 bg-[rgba(26,26,26,1)] border border-[rgba(255,255,255,0.1)] rounded-xl overflow-hidden shadow-xl z-50 min-w-[120px]">
-                {["png", "jpg", "pdf"].map((format) => (
-                  <button
-                    type="button"
-                    key={format}
-                    onClick={() => {
-                      setSelectedFormat(format as "png" | "jpg" | "pdf");
-                      setIsDropdownOpen(false);
-                    }}
-                    className={`w-full px-4 py-3 text-left text-sm uppercase font-medium transition-colors ${selectedFormat === format
-                        ? "bg-[rgba(147,51,234,1)] text-white"
-                        : "text-[rgba(209,213,219,1)] hover:bg-[rgba(255,255,255,0.05)]"
-                      }`}
-                  >
-                    {format}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Download Button */}
+          {/* Download Button - Disabled */}
           <button
-            onClick={handleDownload}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[rgba(147,51,234,1)] to-[rgba(8,145,178,1)] hover:from-[rgba(168,85,247,1)] hover:to-[rgba(6,182,212,1)] text-white font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-lg shadow-[rgba(168,85,247,0.2)]"
+            disabled
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[rgba(147,51,234,0.5)] to-[rgba(8,145,178,0.5)] text-[rgba(209,213,219,1)] font-bold rounded-xl transition-all cursor-not-allowed opacity-60 shadow-lg shadow-[rgba(168,85,247,0.1)]"
           >
             <Download size={18} />
-            Download
+            Download PDF
           </button>
         </div>
 
