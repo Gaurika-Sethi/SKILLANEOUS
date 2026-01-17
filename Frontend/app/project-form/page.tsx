@@ -12,6 +12,11 @@ export default function ProjectGenerationForm() {
   const [targetRole, setTargetRole] = useState("");
   const [skillLevel, setSkillLevel] = useState("Beginner");
   const [learningObjective, setLearningObjective] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
+
   
   // Tech Stack starts empty
   const [tags, setTags] = useState<string[]>([]); 
@@ -65,6 +70,88 @@ export default function ProjectGenerationForm() {
     setList(list.includes(val) ? list.filter(i => i !== val) : [...list, val]);
   };
 
+  const mapSkillLevel = (lvl: string) => {
+  const m: Record<string, string> = {
+    Beginner: "BEGINNER",
+    Intermediate: "INTERMEDIATE",
+    Advanced: "ADVANCED",
+  };
+  return m[lvl] || "BEGINNER";
+};
+
+const mapOutputPrefs = (prefs: string[]) => {
+  const map: Record<string, string> = {
+    "Resume ready": "RESUME_READY",
+    "Portfolio": "PORTFOLIO",
+    "Github": "GITHUB",
+    "Deployable": "DEPLOYABLE",
+    "No pref": "NO_PREF",
+  };
+  return prefs.map((p) => map[p]).filter(Boolean);
+};
+
+const mapDeployPrefs = (prefs: string[]) => {
+  const map: Record<string, string> = {
+    "None": "NONE",
+    "Cloud": "CLOUD",
+    "Docker": "DOCKER",
+    "CI/CD": "CICD",
+    "No pref": "NO_PREF",
+  };
+  return prefs.map((p) => map[p]).filter(Boolean);
+};
+
+const handleSubmit = async () => {
+  setError(null);
+  setSuccessMsg(null);
+  setLoading(true);
+
+  const payload = {
+    targetRole: targetRole.trim(),
+    skillLevel: mapSkillLevel(skillLevel),
+    learningObjective: learningObjective.trim(),
+    techStack: tags,
+    outputPreference: mapOutputPrefs(outputPrefs),
+    deploymentPreference: mapDeployPrefs(deployPrefs),
+  };
+
+  console.log("✅ Submitting payload:", payload);
+
+  try {
+    const res = await fetch("http://localhost:8000/api/v1/projects/generate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("✅ Response status:", res.status);
+
+    const data = await res.json();
+    console.log("✅ Response data:", data);
+
+    if (!res.ok) throw new Error(data?.message || "Failed to generate project");
+
+    setSuccessMsg(`Saved to DB ✅ RequestId: ${data?.data?.requestId}`);
+  } catch (err: any) {
+    console.error("❌ API error:", err);
+    setError(err.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleRegenerate = async (requestId: string) => {
+  const res = await fetch(`http://localhost:5000/api/projects/${requestId}/regenerate`, {
+    method: "POST",
+  });
+
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.message || "Failed to regenerate");
+
+  return data;
+};
+
+
   return (
     <div 
       className="min-h-screen px-6 py-16 font-sans selection:bg-indigo-500/30"
@@ -108,7 +195,7 @@ export default function ProjectGenerationForm() {
           </p>
         </header>
 
-        <form className="space-y-16" onSubmit={(e) => e.preventDefault()}>
+        <form className="space-y-16" onSubmit={(e) => { e.preventDefault(); if (!isFormValid || loading) return; handleSubmit(); }}>
           
           {/* --- SECTION 01: DIRECTION --- */}
           <section className="space-y-8">
@@ -168,7 +255,7 @@ export default function ProjectGenerationForm() {
                         key={index} className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-black border animate-in fade-in zoom-in duration-200"
                         style={{ backgroundColor: "rgba(99, 102, 241, 0.1)", borderColor: "rgba(99, 102, 241, 0.3)", color: "rgba(165, 180, 252, 1)" }}
                     >
-                      {tag} <button onClick={() => setTags(tags.filter((_, i) => i !== index))} className="hover:text-white transition-colors"><X size={14} /></button>
+                      {tag} <button type="button" title={`Remove ${tag}`} onClick={() => setTags(tags.filter((_, i) => i !== index))} className="hover:text-white transition-colors"><X size={14} /></button>
                     </span>
                   ))}
                   <input 
@@ -197,14 +284,14 @@ export default function ProjectGenerationForm() {
                 </div>
               </div>
 
-              <div className="space-y-4">
+                {/* <div className="space-y-4">
                 <label className="text-xs font-black uppercase tracking-widest" style={{ color: colors.textDim }}>Time Commitment <span style={{ color: colors.textWarn }}>*</span></label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <SelectCard label="<1 hr / day" sublabel="Light Pace" icon={<Clock size={20}/>} rgba="14, 165, 233" active={timeCommit === "<1 hr"} onClick={() => setTimeCommit("<1 hr")} />
                   <SelectCard label="1-3 hrs / day" sublabel="Steady Progress" icon={<Clock size={20}/>} rgba="99, 102, 241" active={timeCommit === "1-3hr"} onClick={() => setTimeCommit("1-3hr")} />
                   <SelectCard label="3+ hrs / day" sublabel="Deep Mastery" icon={<Clock size={20}/>} rgba="244, 63, 94" active={timeCommit === "3+ hrs"} onClick={() => setTimeCommit("3+ hrs")} />
                 </div>
-              </div>
+                </div> */}
 
               <div className="space-y-4">
                 <label className="text-xs font-black uppercase tracking-widest" style={{ color: colors.textDim }}>Deployment <span style={{ color: colors.textWarn }}>*</span></label>
@@ -222,7 +309,8 @@ export default function ProjectGenerationForm() {
           {/* --- SUBMIT --- */}
           <div className="pt-10 pb-20">
             <button 
-              disabled={!isFormValid}
+              type="submit"
+              disabled={!isFormValid || loading}
               className="group relative w-full font-black py-7 rounded-2xl transition-all flex items-center justify-center gap-3 tracking-tight text-xl uppercase"
               style={{ 
                 backgroundColor: isFormValid ? colors.white : "rgba(255, 255, 255, 0.05)", 
@@ -232,9 +320,21 @@ export default function ProjectGenerationForm() {
               }}
             >
               {!isFormValid && <Lock size={20} style={{ opacity: 0.3 }} />}
-              Generate Project Blueprint
-              {isFormValid && <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />}
+              {loading ? "Generating..." : "Generate Project Blueprint"}
+              {isFormValid && !loading && ( <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />)}
             </button>
+            {error && (
+              <p className="text-center mt-4 text-sm font-bold" style={{ color: colors.textWarn }}>
+                {error}
+                </p>
+              )}
+              
+              {successMsg && (
+                <p className="text-center mt-4 text-sm font-bold" style={{ color: colors.successGreen }}>
+                  {successMsg}
+                  </p>
+                )}
+
             <p className="text-center mt-6 text-xs font-black uppercase tracking-[0.3em]" style={{ color: isFormValid ? colors.successGreen : colors.textWarn }}>
               {isFormValid ? "Engine ready for synthesis" : "Fill all required sections to unlock"}
             </p>
