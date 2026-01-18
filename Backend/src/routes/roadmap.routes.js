@@ -14,4 +14,8 @@ router.post("/topic-summary", getTopicSummary);
 
 router.post("/subtopic-details", getSubtopicDetails);
 
+router.get("/curated", getCuratedRoadmaps);
+
+router.get("/:id", getRoadmapById);
+
 export default router;

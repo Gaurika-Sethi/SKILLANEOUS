@@ -6,9 +6,6 @@ import { GeneratedRoadmap } from "../models/generatedRoadmap.model.js";
 import { generateFromAI } from "../utils/ai.js";
 import { buildRoadmapPrompt } from "../utils/roadmapPrompt.js";
 
-/**
- * ✅ Clean AI JSON output (remove markdown fences if any)
- */
 const cleanAIJson = (raw) =>
   raw
     .trim()
@@ -17,17 +14,13 @@ const cleanAIJson = (raw) =>
     .replace(/```$/i, "")
     .trim();
 
-/**
- * ✅ Adds stable IDs to topics and subtopics
- * Converts subtopics from string[] → {id,title}[]
- */
 const attachIdsToRoadmap = (structured) => {
   if (!structured?.phases || !Array.isArray(structured.phases)) return structured;
 
   const phases = structured.phases.map((phase, pi) => {
     const topics = (phase.topics || []).map((topic, ti) => {
       const subtopics = (topic.subtopics || []).map((s, si) => {
-        // Convert string -> object
+        
         if (typeof s === "string") {
           return {
             id: `subtopic-${pi + 1}-${ti + 1}-${si + 1}`,
@@ -35,7 +28,6 @@ const attachIdsToRoadmap = (structured) => {
           };
         }
 
-        // Already object
         return {
           id: s?.id || `subtopic-${pi + 1}-${ti + 1}-${si + 1}`,
           title: s?.title || "",
@@ -126,10 +118,149 @@ const generateRoadmap = asyncHandler(async (req, res) => {
     { upsert: true, new: true }
   );
 
+
+const getCuratedRoadmaps = async (req, res) => {
+  try {
+    const roadmaps = await GeneratedRoadmap.find({
+      roadmapType: "curated",
+      isDefault: true,
+      visibility: "public",
+    })
+      .select("card structured.title visibility createdAt")
+      .sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      success: true,
+      data: roadmaps.map((r) => ({
+        _id: r._id,
+        card: r.card,
+        structuredTitle: r?.structured?.title ?? "",
+      })),
+    });
+  } catch (err) {
+    console.error("getCuratedRoadmaps error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch curated roadmaps",
+    });
+  }
+};
+
+const getRoadmapById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid roadmap id",
+      });
+    }
+
+    const roadmap = await GeneratedRoadmap.findById(id).select(
+      "structured visibility roadmapType isDefault"
+    );
+
+    if (!roadmap) {
+      return res.status(404).json({
+        success: false,
+        message: "Roadmap not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        roadmapId: roadmap._id,
+        visibility: roadmap.visibility,
+        structured: roadmap.structured,
+        roadmapType: roadmap.roadmapType,
+        isDefault: roadmap.isDefault,
+      },
+    });
+  } catch (err) {
+    console.error("getRoadmapById error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch roadmap",
+    });
+  }
+};
+
   // 7️⃣ Respond
   return res
     .status(201)
     .json(new ApiResponse(201, generated.structured, "Roadmap generated successfully"));
 });
 
-export { generateRoadmap };
+
+const getCuratedRoadmaps = async (req, res) => {
+  try {
+    const roadmaps = await GeneratedRoadmap.find({
+      roadmapType: "curated",
+      isDefault: true,
+      visibility: "public",
+    })
+      .select("card structured.title visibility createdAt")
+      .sort({ createdAt: 1 });
+
+    return res.status(200).json({
+      success: true,
+      data: roadmaps.map((r) => ({
+        _id: r._id,
+        card: r.card,
+        structuredTitle: r?.structured?.title ?? "",
+      })),
+    });
+  } catch (err) {
+    console.error("getCuratedRoadmaps error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch curated roadmaps",
+    });
+  }
+};
+
+const getRoadmapById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid roadmap id",
+      });
+    }
+
+    const roadmap = await GeneratedRoadmap.findById(id).select(
+      "structured visibility roadmapType isDefault"
+    );
+
+    if (!roadmap) {
+      return res.status(404).json({
+        success: false,
+        message: "Roadmap not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        roadmapId: roadmap._id,
+        visibility: roadmap.visibility,
+        structured: roadmap.structured,
+        roadmapType: roadmap.roadmapType,
+        isDefault: roadmap.isDefault,
+      },
+    });
+  } catch (err) {
+    console.error("getRoadmapById error:", err);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch roadmap",
+    });
+  }
+};
+
+
+export { generateRoadmap, getCuratedRoadmaps, getRoadmapById };
