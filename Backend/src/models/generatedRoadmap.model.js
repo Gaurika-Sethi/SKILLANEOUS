@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const generatedRoadmapSchema = new mongoose.Schema(
   {
+    slug: { 
+      type: String, 
+      unique: true, 
+      sparse: true 
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

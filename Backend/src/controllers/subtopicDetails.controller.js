@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { GeneratedRoadmap } from "../models/generatedRoadmap.model.js";
 import { SubtopicDetail } from "../models/subtopicDetail.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -14,9 +15,6 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
     );
   }
 
-  console.log("HEADERS:", req.headers["content-type"]);
-  console.log("BODY:", req.body);
-
   // ✅ 1) cache
   const cached = await SubtopicDetail.findOne({
     roadmapRequestId,
@@ -29,9 +27,17 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
     return res.status(200).json({ success: true, data: cached });
   }
 
-  // ✅ 2) roadmap fetch
-  const roadmap = await GeneratedRoadmap.findOne({ roadmapRequestId }).lean();
-  if (!roadmap?.structured) throw new ApiError(404, "Generated roadmap not found");
+  // ✅ 2) roadmap fetch (supports BOTH generated and curated)
+  let roadmap = await GeneratedRoadmap.findOne({ roadmapRequestId }).lean();
+
+  // If not found by roadmapRequestId, try by _id (curated case)
+  if (!roadmap && mongoose.Types.ObjectId.isValid(roadmapRequestId)) {
+    roadmap = await GeneratedRoadmap.findById(roadmapRequestId).lean();
+  }
+
+  if (!roadmap?.structured) {
+    throw new ApiError(404, "Roadmap not found");
+  }
 
   // normalize
   let structured = roadmap.structured;
@@ -53,17 +59,21 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
 
   const phaseLabel = phase.label || phase.title || phase.name || phaseId;
 
-  // ✅ 4) locate topic using topicId
+  // ✅ 4) locate topic
   const topic = (phase.topics || []).find((t) => t.id === topicId);
-  if (!topic) throw new ApiError(404, `Topic '${topicId}' not found in phase '${phaseId}'`);
+  if (!topic)
+    throw new ApiError(
+      404,
+      `Topic '${topicId}' not found in phase '${phaseId}'`
+    );
 
   const topicTitle = topic.title || "Topic";
 
-  // ✅ 5) locate subtopic using subtopicId
+  // ✅ 5) locate subtopic
   const subtopicsArray = Array.isArray(topic.subtopics) ? topic.subtopics : [];
 
   const subtopicObj = subtopicsArray.find((s) => {
-    if (typeof s === "string") return false; // roadmap should now be object-based, but safe check
+    if (typeof s === "string") return false;
     return s.id === subtopicId;
   });
 
@@ -76,7 +86,6 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
 
   const subtopicTitle = subtopicObj.title;
 
-  // helpful for AI prompt
   const allSubtopicsInTopic = subtopicsArray.map((s) =>
     typeof s === "string" ? s : s.title
   );
@@ -90,7 +99,7 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
     allSubtopicsInTopic,
   });
 
-  // ✅ 7) upsert (safe)
+  // ✅ 7) upsert
   const saved = await SubtopicDetail.findOneAndUpdate(
     { roadmapRequestId, phaseId, topicId, subtopicId },
     {
@@ -98,13 +107,9 @@ const getSubtopicDetails = asyncHandler(async (req, res) => {
       phaseId,
       topicId,
       subtopicId,
-
-      // store titles too for display/search/debug
       topicTitle,
       subtopicTitle,
-
       ...ai,
-
       ai_metadata: {
         provider: "openai",
         model: "gpt-4o-mini",

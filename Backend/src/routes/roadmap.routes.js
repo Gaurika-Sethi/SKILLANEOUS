@@ -1,6 +1,6 @@
 import express from "express";
 import { createRoadmapRequest } from "../controllers/roadmap.controller.js";
-import { generateRoadmap } from "../controllers/generatedRoadmap.controller.js";
+import { generateRoadmap, getCuratedRoadmap, getRoadmapById } from "../controllers/generatedRoadmap.controller.js";
 import { getTopicSummary } from "../controllers/topicSummary.controller.js";
 import { getSubtopicDetails } from "../controllers/subtopicDetails.controller.js";
 
@@ -14,8 +14,8 @@ router.post("/topic-summary", getTopicSummary);
 
 router.post("/subtopic-details", getSubtopicDetails);
 
-router.get("/curated", getCuratedRoadmaps);
+router.post("/curated", getCuratedRoadmap);
 
-router.get("/:id", getRoadmapById);
+router.post("/:id", getRoadmapById);
 
 export default router;

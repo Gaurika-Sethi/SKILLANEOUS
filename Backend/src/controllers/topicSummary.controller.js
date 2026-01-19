@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { GeneratedRoadmap } from "../models/generatedRoadmap.model.js";
 import { TopicSummary } from "../models/topicSummary.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -17,10 +18,16 @@ const getTopicSummary = asyncHandler(async (req, res) => {
     return res.status(200).json({ success: true, data: cached });
   }
 
-  // ✅ 2) Fetch roadmap
-  const roadmap = await GeneratedRoadmap.findOne({ roadmapRequestId }).lean();
+  // ✅ 2) Fetch roadmap (supports BOTH generated and curated)
+  let roadmap = await GeneratedRoadmap.findOne({ roadmapRequestId }).lean();
+
+  // If not found by roadmapRequestId, try by _id
+  if (!roadmap && mongoose.Types.ObjectId.isValid(roadmapRequestId)) {
+    roadmap = await GeneratedRoadmap.findById(roadmapRequestId).lean();
+  }
+
   if (!roadmap?.structured) {
-    throw new ApiError(404, "Generated roadmap not found");
+    throw new ApiError(404, "Roadmap not found");
   }
 
   let structured = roadmap.structured;
@@ -35,7 +42,9 @@ const getTopicSummary = asyncHandler(async (req, res) => {
   if (!topic) throw new ApiError(404, `Topic '${topicId}' not found`);
 
   const topicTitle = topic.title || "Topic";
-  const subtopics = (topic.subtopics || []).map((s) => (typeof s === "string" ? s : s.title));
+  const subtopics = (topic.subtopics || []).map((s) =>
+    typeof s === "string" ? s : s.title
+  );
 
   // ✅ 3) Generate summary
   const ai = await generateTopicSummaryFromAI({
