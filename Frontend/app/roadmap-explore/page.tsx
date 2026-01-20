@@ -6,10 +6,7 @@ import {
   Search,
   SlidersHorizontal,
   ChevronDown,
-  Users,
   Star,
-  Clock,
-  GraduationCap,
   LayoutGrid,
 } from "lucide-react";
 
@@ -18,7 +15,6 @@ export default function RoadmapsPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     level: "All Levels",
-    duration: "Any Duration",
     type: "All Types",
   });
 
@@ -51,10 +47,10 @@ export default function RoadmapsPage() {
           }))
         );
       } else {
-        console.error("❌ Failed to fetch curated roadmaps:", data);
+        console.error("Failed to fetch curated roadmaps:", data);
       }
     } catch (err) {
-      console.error("❌ Error fetching curated roadmaps:", err);
+      console.error("Error fetching curated roadmaps:", err);
     } finally {
       setLoading(false);
     }
@@ -64,12 +60,6 @@ export default function RoadmapsPage() {
 }, []);
 
   // Filter logic
-  const getDurationCategory = (durationStr: string) => {
-    const months = parseInt(durationStr);
-    if (months <= 3) return "Short (1-3 months)";
-    if (months <= 6) return "Medium (4-6 months)";
-    return "Long (7-12 months)";
-  };
 
   const filteredRoadmaps = roadmaps.filter((roadmap) => {
     const matchesSearch =
@@ -79,12 +69,7 @@ export default function RoadmapsPage() {
     const matchesLevel =
       filters.level === "All Levels" || roadmap.level === filters.level;
 
-    const roadmapDurationCategory = getDurationCategory(roadmap.duration);
-    const matchesDuration =
-      filters.duration === "Any Duration" ||
-      roadmapDurationCategory === filters.duration;
-
-    return matchesSearch && matchesLevel && matchesDuration;
+    return matchesSearch && matchesLevel;
   });
 
   return (
@@ -146,17 +131,6 @@ export default function RoadmapsPage() {
                   onChange={(val) => setFilters({ ...filters, level: val })}
                 />
                 <FilterDropdown
-                  label="Duration"
-                  value={filters.duration}
-                  options={[
-                    "Any Duration",
-                    "Short (1-3 months)",
-                    "Medium (4-6 months)",
-                    "Long (7-12 months)",
-                  ]}
-                  onChange={(val) => setFilters({ ...filters, duration: val })}
-                />
-                <FilterDropdown
                   label="Roadmap Type"
                   value={filters.type}
                   options={["All Types", "Curated", "Community"]}
@@ -186,9 +160,6 @@ export default function RoadmapsPage() {
                   title={roadmap.title}
                   desc={roadmap.desc}
                   tags={roadmap.tags}
-                  duration={roadmap.duration}
-                  students={roadmap.students}
-                  color={roadmap.color}
                 />
               ))}
 
@@ -287,7 +258,7 @@ function SectionDivider({ icon, label, color, bgColor, borderColor }: any) {
   );
 }
 
-function RoadmapCard({ _id, level, title, desc, tags, duration, students, color, creator }: any) {
+function RoadmapCard({ _id, level, title, desc, tags, creator }: any) {
   const router = useRouter();
 
   // Determine border and glow colors based on level
@@ -366,16 +337,6 @@ function RoadmapCard({ _id, level, title, desc, tags, duration, students, color,
         </span>
       </div>
 
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-gray-500 text-[10px] font-bold uppercase tracking-widest mb-8">
-        <div className="flex items-center gap-1.5">
-          <Clock size={12} /> {duration}
-        </div>
-        <div className="flex items-center gap-1.5">
-          <Users size={12} /> {students} students
-        </div>
-      </div>
-
       {/* Community Creator Info */}
       {creator && (
         <div className="flex items-center gap-3 pt-6 mb-8 border-t border-white/5">
@@ -395,7 +356,7 @@ function RoadmapCard({ _id, level, title, desc, tags, duration, students, color,
       <button
           type="button"
           onClick={() => {
-            if (!_id) return console.error("❌ Roadmap id missing");
+            if (!_id) return console.error("Roadmap id missing");
             router.push(`/roadmap?id=${_id}&source=curated&visibility=public`);
           }}
           className="w-full py-4 bg-white/5 border border-white/10 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all hover:text-black mt-auto"
