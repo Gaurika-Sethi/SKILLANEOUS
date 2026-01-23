@@ -71,6 +71,72 @@ const generateProject = async (req, res) => {
   }
 };
 
+const getProjectById = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const { requestId } = req.query;
+
+    if (!mongoose.Types.ObjectId.isValid(projectId) && requestId && !mongoose.Types.ObjectId.isValid(requestId)) {
+      throw new ApiError(400, "Invalid id format.");
+    }
+
+    let projectDoc = null;
+
+    // Try primary lookup by projectId
+    if (mongoose.Types.ObjectId.isValid(projectId)) {
+      projectDoc = await GeneratedProject.findById(projectId).lean();
+    }
+
+    // Fallback lookup by requestId (query) if provided
+    if (!projectDoc && requestId && mongoose.Types.ObjectId.isValid(requestId)) {
+      projectDoc = await GeneratedProject.findOne({ projectRequestId: requestId }).lean();
+    }
+
+    // Fallback: if the path param was actually requestId
+    if (!projectDoc && mongoose.Types.ObjectId.isValid(projectId)) {
+      projectDoc = await GeneratedProject.findOne({ projectRequestId: projectId }).lean();
+    }
+
+    if (!projectDoc) {
+      throw new ApiError(404, "Project not found.");
+    }
+
+    // Fetch the originating request for contextual fields
+    const requestDoc = await ProjectRequest.findById(projectDoc.projectRequestId).lean();
+    const wantsGithub = Array.isArray(requestDoc?.outputPreference) && requestDoc.outputPreference.includes("GITHUB");
+
+    const sanitized = sanitizeGeneratedProject(projectDoc, wantsGithub);
+
+    // Merge contextual info so frontend can display meta
+    if (requestDoc) {
+      sanitized.targetRole = requestDoc.targetRole;
+      sanitized.skillLevel = requestDoc.skillLevel;
+      sanitized.techStack = requestDoc.techStack;
+      sanitized.outputPreference = requestDoc.outputPreference;
+      sanitized.deploymentPreference = requestDoc.deploymentPreference;
+      sanitized.learningObjective = requestDoc.learningObjective;
+    }
+
+    // Expose ids for regen / navigation
+    sanitized.projectId = projectDoc._id?.toString();
+    sanitized.projectRequestId = projectDoc.projectRequestId?.toString();
+
+    return res.status(200).json({
+      success: true,
+      data: sanitized,
+    });
+  } catch (error) {
+    console.error("getProjectById error:", error);
+
+    const status = error?.statusCode || 500;
+
+    return res.status(status).json({
+      success: false,
+      message: error?.message || "Internal server error",
+    });
+  }
+};
+
 const regenerateProject = async (req, res) => {
   try {
     const { requestId } = req.params;
@@ -129,4 +195,4 @@ const regenerateProject = async (req, res) => {
   }
 };
 
-export { generateProject, regenerateProject };
+export { generateProject, regenerateProject, getProjectById };

@@ -1,21 +1,21 @@
 "use client";
 
 import React, { useState, KeyboardEvent, useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { 
   Sparkles, Terminal, BookOpen, Settings2, ChevronRight, 
   X, Zap, Globe, Github, Layout, Clock, Server, Cpu, 
-  ShieldCheck, Lock 
+  ShieldCheck, Lock, Loader 
 } from "lucide-react";
 
 export default function ProjectGenerationForm() {
+  const router = useRouter();
   // --- FORM STATE ---
   const [targetRole, setTargetRole] = useState("");
   const [skillLevel, setSkillLevel] = useState("Beginner");
   const [learningObjective, setLearningObjective] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [savedId, setSavedId] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   
   // Tech Stack starts empty
@@ -103,7 +103,6 @@ const mapDeployPrefs = (prefs: string[]) => {
 
 const handleSubmit = async () => {
   setError(null);
-  setSuccessMsg(null);
   setLoading(true);
 
   const payload = {
@@ -131,11 +130,15 @@ const handleSubmit = async () => {
 
     if (!res.ok) throw new Error(data?.message || "Failed to generate project");
 
-    setSuccessMsg(`Saved to DB ✅ RequestId: ${data?.data?.requestId}`);
+    const projectId = data?.data?.projectId;
+    const requestId = data?.data?.requestId;
+    console.log("✅ Redirecting to project display with project ID:", projectId);
+    
+    // Prefer projectId for fetching the generated project
+    router.push(`/project-display?id=${projectId || requestId}`);
   } catch (err: any) {
     console.error("❌ API error:", err);
     setError(err.message || "Something went wrong");
-  } finally {
     setLoading(false);
   }
 };
@@ -313,14 +316,16 @@ const handleRegenerate = async (requestId: string) => {
               disabled={!isFormValid || loading}
               className="group relative w-full font-black py-7 rounded-2xl transition-all flex items-center justify-center gap-3 tracking-tight text-xl uppercase"
               style={{ 
-                backgroundColor: isFormValid ? colors.white : "rgba(255, 255, 255, 0.05)", 
+                backgroundColor: isFormValid && !loading ? colors.white : isFormValid && loading ? "rgba(255, 255, 255, 0.9)" : "rgba(255, 255, 255, 0.05)", 
                 color: isFormValid ? colors.black : colors.textDim,
                 border: isFormValid ? "none" : `2px solid ${colors.borderSoft}`,
-                cursor: isFormValid ? "pointer" : "not-allowed",
+                cursor: isFormValid && !loading ? "pointer" : "not-allowed",
+                opacity: loading ? 0.85 : 1,
               }}
             >
               {!isFormValid && <Lock size={20} style={{ opacity: 0.3 }} />}
-              {loading ? "Generating..." : "Generate Project Blueprint"}
+              {loading && <Loader size={20} className="animate-spin" />}
+              {loading ? "Generating Project..." : "Generate Project Blueprint"}
               {isFormValid && !loading && ( <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />)}
             </button>
             {error && (
@@ -328,13 +333,6 @@ const handleRegenerate = async (requestId: string) => {
                 {error}
                 </p>
               )}
-              
-              {successMsg && (
-                <p className="text-center mt-4 text-sm font-bold" style={{ color: colors.successGreen }}>
-                  {successMsg}
-                  </p>
-                )}
-
             <p className="text-center mt-6 text-xs font-black uppercase tracking-[0.3em]" style={{ color: isFormValid ? colors.successGreen : colors.textWarn }}>
               {isFormValid ? "Engine ready for synthesis" : "Fill all required sections to unlock"}
             </p>

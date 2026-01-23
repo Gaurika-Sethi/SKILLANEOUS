@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import { 
   Sparkles, Terminal, Github, Save, ChevronDown, ChevronUp, 
   Database, Bug, FileJson, Beaker, Lock, 
@@ -20,6 +21,69 @@ export default function ProjectDetailsPage() {
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [checkedItems, setCheckedItems] = useState<Record<number, boolean>>({});
+  const [projectData, setProjectData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  const [regenError, setRegenError] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  // Accept both ?id and ?projectId for flexibility
+  const projectId = searchParams.get('id') || searchParams.get('projectId');
+
+  // --- FETCH PROJECT DATA ---
+  useEffect(() => {
+    const fetchProjectData = async () => {
+      if (!projectId) {
+        console.error('No project ID provided');
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const response = await fetch(`http://localhost:8000/api/v1/projects/${projectId}?requestId=${projectId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch project data');
+        }
+        const data = await response.json();
+
+        // Normalize backend shape to what the UI expects
+        const raw = data?.data || {};
+
+        const normalized = {
+          // ids
+          projectId: raw.projectId || raw._id || projectId,
+          projectRequestId: raw.projectRequestId,
+
+          // meta
+          title: raw.projectTitle || raw.title || "Untitled Project",
+          targetRole: raw.targetRole || "Not specified",
+          skillLevel: raw.skillLevel || "Not specified",
+          techStack: raw.techStack || [],
+          overview: raw.projectDescription || raw.overview || raw.oneLinePitch || "No overview available.",
+
+          // main content
+          features: (raw.features || []).map((f: any) =>
+            typeof f === "string" ? { title: f, description: "" } : f
+          ),
+          folderStructure: Array.isArray(raw.folderStructure)
+            ? raw.folderStructure.join("\n")
+            : raw.folderStructure || "No folder structure available.",
+          deploymentChecklist: (raw.deploymentChecklist || []).map((item: any) =>
+            typeof item === "string" ? { title: item, subtitle: "" } : item
+          ),
+          resumeHighlights: raw.resumeBullets || raw.resumeHighlights || [],
+          readmeContent: raw.githubReadmeTemplate || raw.readmeContent,
+        };
+
+        setProjectData(normalized);
+      } catch (error) {
+        console.error('Error fetching project:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProjectData();
+  }, [projectId]);
 
   // --- RGBA COLOR PALETTE ---
   const colors = {
@@ -33,60 +97,27 @@ export default function ProjectDetailsPage() {
     black: "rgba(0, 0, 0, 1)"
   };
 
-  // --- DATA MODELS ---
-  const folderContent = `src/
-  controllers/
-    auth.controller.ts
-    user.controller.ts
-  routes/
-    auth.routes.ts
-    user.routes.ts
-  models/
-    user.model.ts
-  services/
-    auth.service.ts
-    user.service.ts
-  middlewares/
-    auth.middleware.ts
-    error.middleware.ts
-    validation.middleware.ts
-  utils/
-    logger.ts
-    jwt.ts
-    db.ts
-  config/
-    database.ts
-    environment.ts
-  tests/
-    integration/
-    unit/
-  migrations/
-    001_create_users_table.sql`;
+  // --- LOADING & ERROR STATES ---
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.bgMain }}>
+        <div className="text-center space-y-4">
+          <Terminal size={48} className="animate-pulse mx-auto" style={{ color: colors.accentCyan }} />
+          <p className="text-lg font-bold" style={{ color: colors.textMuted }}>Loading project...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const resumePoints = [
-    "Built production-ready REST API with JWT authentication and role-based access control",
-    "Implemented PostgreSQL database with migration system and connection pooling",
-    "Integrated comprehensive error handling, logging, and API documentation with Swagger",
-    "Configured CI/CD pipeline with GitHub Actions for automated testing and deployment",
-    "Applied security best practices including rate limiting, input validation, and XSS protection"
-  ];
-
-  const readmeMarkdown = `# FullstackStarterKit
-
-A production-ready REST API boilerplate with Node.js, Express, PostgreSQL, and TypeScript.
-
-## Features
-- JWT Authentication with Refresh Tokens
-- PostgreSQL with Migration System
-- Structured Logging with Winston
-- API Documentation with Swagger
-
-## Getting Started
-\`\`\`bash
-npm install
-npm run migrate
-npm run dev
-\`\`\``;
+  if (!projectData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: colors.bgMain }}>
+        <div className="text-center space-y-4">
+          <p className="text-lg font-bold" style={{ color: colors.textMuted }}>Project not found</p>
+        </div>
+      </div>
+    );
+  }
 
   // --- LOGIC HANDLERS ---
   const toggle = (section: keyof typeof expanded) => {
@@ -105,6 +136,67 @@ npm run dev
 
   const handleCheck = (index: number) => {
     setCheckedItems(prev => ({ ...prev, [index]: !prev[index] }));
+  };
+
+  const handleRegenerate = async () => {
+    const requestIdForRegen = projectData?.projectRequestId || projectId;
+    if (!requestIdForRegen) {
+      setRegenError("Missing request id for regeneration");
+      return;
+    }
+
+    setIsRegenerating(true);
+    setRegenError(null);
+
+    try {
+      const res = await fetch(`http://localhost:8000/api/v1/projects/${requestIdForRegen}/regenerate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || "Failed to regenerate project");
+      }
+
+      const raw = data?.data?.project || {};
+      const newProjectId = data?.data?.projectId || projectData.projectId;
+
+      const normalized = {
+        projectId: newProjectId,
+        projectRequestId: requestIdForRegen,
+        title: raw.projectTitle || raw.title || "Untitled Project",
+        targetRole: raw.targetRole || projectData.targetRole || "Not specified",
+        skillLevel: raw.skillLevel || projectData.skillLevel || "Not specified",
+        techStack: raw.techStack || projectData.techStack || [],
+        overview: raw.projectDescription || raw.overview || raw.oneLinePitch || projectData.overview,
+        features: (raw.features || []).map((f: any) =>
+          typeof f === "string" ? { title: f, description: "" } : f
+        ),
+        folderStructure: Array.isArray(raw.folderStructure)
+          ? raw.folderStructure.join("\n")
+          : raw.folderStructure || projectData.folderStructure,
+        deploymentChecklist: (raw.deploymentChecklist || []).map((item: any) =>
+          typeof item === "string" ? { title: item, subtitle: "" } : item
+        ),
+        resumeHighlights: raw.resumeBullets || raw.resumeHighlights || projectData.resumeHighlights || [],
+        readmeContent: raw.githubReadmeTemplate || raw.readmeContent || projectData.readmeContent,
+      };
+
+      // Update URL so sharing reflects new project id
+      if (newProjectId) {
+        const url = new URL(window.location.href);
+        url.searchParams.set("id", newProjectId);
+        window.history.replaceState({}, "", url.toString());
+      }
+
+      setProjectData(normalized);
+    } catch (err: any) {
+      console.error("Regenerate error", err);
+      setRegenError(err.message || "Failed to regenerate");
+    } finally {
+      setIsRegenerating(false);
+    }
   };
 
   return (
@@ -136,16 +228,16 @@ npm run dev
                 color: "transparent",
               }}
             >
-              Fullstack Starter Kit
+              {projectData.title || "Untitled Project"}
             </h1>
 
             <div className="flex flex-wrap gap-12">
-              <MetaItem label="Target Role" value="Full Stack Developer" />
-              <MetaItem label="Skill Level" value="Intermediate" />
+              <MetaItem label="Target Role" value={projectData.targetRole || "Not specified"} />
+              <MetaItem label="Skill Level" value={projectData.skillLevel || "Not specified"} />
               <div className="space-y-2">
                 <p className="text-[10px] font-black uppercase tracking-[0.2em]" style={{ color: colors.textDim }}>Tech Stack</p>
                 <div className="flex flex-wrap gap-2">
-                  {["Node.js", "Express", "PostgreSQL", "React", "TypeScript", "Docker"].map(tech => (
+                  {(projectData.techStack || []).map((tech: string) => (
                     <span 
                       key={tech} className="px-3 py-1 rounded-full border text-xs font-bold"
                       style={{ backgroundColor: "rgba(255,255,255,0.03)", borderColor: "rgba(255,255,255,0.1)", color: colors.textMuted }}
@@ -163,7 +255,7 @@ npm run dev
         <CollapsibleSection title="Project Overview" icon={<Layout size={20}/>} isOpen={expanded.overview} onToggle={() => toggle('overview')}>
           <div className="space-y-6">
             <p className="text-lg leading-relaxed font-medium" style={{ color: colors.textMuted }}>
-              This starter kit provides a solid foundation for building scalable backend services. It includes user authentication with JWT, role-based access control, PostgreSQL integration with migrations, and a complete CI/CD pipeline.
+              {projectData.overview || "No overview available."}
             </p>
           </div>
         </CollapsibleSection>
@@ -171,9 +263,14 @@ npm run dev
         {/* --- 03. FEATURES --- */}
         <CollapsibleSection title="Features" icon={<CheckCircle2 size={20}/>} isOpen={expanded.features} onToggle={() => toggle('features')}>
           <div className="grid grid-cols-1 gap-4">
-            <FeatureCard title="Authentication & Authorization" desc="JWT-based authentication with refresh tokens and RBAC middleware." icon={<Lock size={18}/>} />
-            <FeatureCard title="Database Integration" desc="PostgreSQL with connection pooling and migration scripts." icon={<Database size={18}/>} />
-            <FeatureCard title="Error Handling & Logging" desc="Centralized error handling and structured logging with Winston." icon={<Bug size={18}/>} />
+            {(projectData.features || []).map((feature: any, idx: number) => (
+              <FeatureCard 
+                key={idx}
+                title={feature.title} 
+                desc={feature.description} 
+                icon={<CheckCircle2 size={18}/>} 
+              />
+            ))}
           </div>
         </CollapsibleSection>
 
@@ -181,10 +278,10 @@ npm run dev
         <CollapsibleSection title="Folder Structure" icon={<FolderTree size={20}/>} isOpen={expanded.structure} onToggle={() => toggle('structure')}>
           <div className="relative group">
             <pre className="p-8 rounded-3xl border-2 overflow-x-auto text-sm font-mono leading-relaxed" style={{ backgroundColor: "rgba(0,0,0,0.3)", borderColor: colors.borderSoft, color: "rgba(200, 200, 210, 1)" }}>
-              {folderContent}
+              {projectData.folderStructure || "No folder structure available."}
             </pre>
             <button 
-              onClick={() => copyToClipboard(folderContent, 'folder')}
+              onClick={() => copyToClipboard(projectData.folderStructure || '', 'folder')}
               className="absolute top-6 right-6 p-2 rounded-lg bg-white/10 border border-white/10 hover:bg-white/20 transition-all flex items-center gap-2"
             >
               {copiedId === 'folder' ? <Check size={16} className="text-green-400" /> : <Copy size={16} />}
@@ -196,13 +293,8 @@ npm run dev
         {/* --- 05. DEPLOYMENT CHECKLIST --- */}
         <CollapsibleSection title="Deployment Checklist" icon={<ListChecks size={20}/>} isOpen={expanded.checklist} onToggle={() => toggle('checklist')}>
           <div className="space-y-3">
-            {[
-              { t: "Create Dockerfile and docker-compose.yml", s: "Set up containerization for environments" },
-              { t: "Run project locally using Docker", s: "Verify all services start correctly" },
-              { t: "Add GitHub Actions workflow", s: "Automate testing on every commit" },
-              { t: "Deploy to cloud platform", s: "Render, Railway, or AWS" }
-            ].map((item, i) => (
-              <ChecklistItem key={i} title={item.t} sub={item.s} checked={!!checkedItems[i]} onCheck={() => handleCheck(i)} />
+            {(projectData.deploymentChecklist || []).map((item: any, i: number) => (
+              <ChecklistItem key={i} title={item.title || item.t} sub={item.subtitle || item.s} checked={!!checkedItems[i]} onCheck={() => handleCheck(i)} />
             ))}
           </div>
         </CollapsibleSection>
@@ -211,7 +303,7 @@ npm run dev
         <CollapsibleSection title="Resume Highlights" icon={<FileText size={20}/>} isOpen={expanded.resume} onToggle={() => toggle('resume')}>
           <div className="space-y-4">
             <div className="space-y-3">
-              {resumePoints.map((point, i) => (
+              {(projectData.resumeHighlights || []).map((point: string, i: number) => (
                 <div key={i} className="flex items-center justify-between p-5 rounded-2xl border bg-white/[0.02]" style={{ borderColor: colors.borderSoft }}>
                   <div className="flex items-center gap-4">
                     <div className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
@@ -224,7 +316,7 @@ npm run dev
               ))}
             </div>
             <button 
-              onClick={() => copyToClipboard(resumePoints.join('\n'), 'res-all')}
+              onClick={() => copyToClipboard((projectData.resumeHighlights || []).join('\n'), 'res-all')}
               className="px-6 py-3 rounded-xl border font-black uppercase text-xs tracking-widest bg-white/5 border-white/10 hover:bg-white/10 transition-all flex items-center gap-2"
             >
               {copiedId === 'res-all' ? <Check size={14} /> : <Copy size={14} />}
@@ -239,31 +331,15 @@ npm run dev
             <div className="flex items-center justify-between px-6 py-4 bg-white/[0.03] border-b" style={{ borderColor: colors.borderSoft }}>
               <span className="text-[10px] font-black uppercase opacity-40 tracking-[0.2em]">Markdown Preview</span>
               <button 
-                onClick={() => copyToClipboard(readmeMarkdown, 'readme')}
+                onClick={() => copyToClipboard(projectData.readmeContent || '', 'readme')}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/10 text-[10px] font-black uppercase hover:bg-white/20 transition-all flex items-center"
               >
                 {copiedId === 'readme' ? <Check size={12} className="text-green-400 mr-1.5" /> : <Copy size={12} className="mr-1.5" />}
                 {copiedId === 'readme' ? 'Copied' : 'Copy README'}
               </button>
             </div>
-            <div className="p-8 font-mono text-sm leading-relaxed max-h-[400px] overflow-y-auto" style={{ color: colors.textMuted }}>
-              <h2 className="text-white font-black mb-4 text-2xl"># FullstackStarterKit</h2>
-              <p className="mb-6">A production-ready REST API boilerplate for building scalable backend services with Node.js, Express, PostgreSQL, and TypeScript.</p>
-              
-              <h3 className="text-white font-bold mb-2">## Features</h3>
-              <ul className="list-disc pl-5 space-y-2 mb-6">
-                <li>JWT Authentication with Refresh Tokens</li>
-                <li>PostgreSQL with Migration System</li>
-                <li>Structured Logging with Winston</li>
-                <li>API Documentation with Swagger</li>
-              </ul>
-
-              <h3 className="text-white font-bold mb-2">## Quick Start</h3>
-              <div className="bg-black/30 p-4 rounded-xl border border-white/5 text-cyan-400">
-                <p>npm install</p>
-                <p>npm run migrate</p>
-                <p>npm run dev</p>
-              </div>
+            <div className="p-8 font-mono text-sm leading-relaxed max-h-[400px] overflow-y-auto whitespace-pre-wrap" style={{ color: colors.textMuted }}>
+              {projectData.readmeContent || "No README content available."}
             </div>
           </div>
         </CollapsibleSection>
@@ -274,14 +350,16 @@ npm run dev
           <div className="text-center space-y-2">
             <p className="text-xs font-black uppercase tracking-[0.4em]" style={{ color: colors.textDim }}>End of blueprint</p>
             <h3 className="text-xl font-bold">Want a different approach?</h3>
+            {regenError && <p className="text-sm font-semibold text-red-400 mt-2">{regenError}</p>}
           </div>
           <button 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="group flex items-center gap-4 px-12 py-6 rounded-[2rem] font-black uppercase tracking-tighter text-2xl border-2 transition-all hover:bg-white hover:text-black hover:scale-105 active:scale-95"
+            onClick={handleRegenerate}
+            disabled={isRegenerating}
+            className="group flex items-center gap-4 px-12 py-6 rounded-[2rem] font-black uppercase tracking-tighter text-2xl border-2 transition-all hover:bg-white hover:text-black hover:scale-105 active:scale-95 disabled:opacity-60 disabled:hover:scale-100 disabled:cursor-not-allowed"
             style={{ borderColor: "rgba(255, 255, 255, 0.15)" }}
           >
-            <RefreshCw size={28} className="group-hover:rotate-180 transition-transform duration-700" />
-            Regenerate Project
+            <RefreshCw size={28} className={`${isRegenerating ? 'animate-spin' : 'group-hover:rotate-180'} transition-transform duration-700`} />
+            {isRegenerating ? 'Regenerating...' : 'Regenerate Project'}
           </button>
         </div>
 

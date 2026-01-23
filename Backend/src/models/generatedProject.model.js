@@ -6,7 +6,6 @@ const generatedProjectSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "ProjectRequest",
       required: true,
-      index: true,
     },
 
     projectTitle: {
