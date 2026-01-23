@@ -42,6 +42,7 @@ Hard Rules:
 - folderStructure must follow this style:
   - use "src/controllers/", "src/routes/", "src/models/", "src/services/", "src/utils/", "src/middlewares/", "src/config/"
   - Do NOT use "middleware" (must be "middlewares") or "service" (must be "services")
+  - include at least 18-25 entries with nested paths and files (e.g., "src/controllers/auth.controller.js", "src/routes/auth.routes.js", "src/models/user.model.js", "src/services/auth.service.js", "src/utils/logger.js", "src/middlewares/auth.middleware.js", "src/config/db.js", "src/tests/auth.test.js", "scripts/seed.js", "docs/README.md") so the structure feels complete
 - If techStack is specified, use ONLY those technologies.
 - If techStack is empty, choose popular modern stack suitable for the targetRole and skillLevel.
 - Add a "slug" field derived from projectTitle must be lowercase, hyphen separated.

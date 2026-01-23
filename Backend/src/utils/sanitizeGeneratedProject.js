@@ -13,7 +13,6 @@ const sanitizeGeneratedProject = (data, wantsGithub) => {
   forceArray("resumeBullets");
 
   clean.features = clean.features.slice(0, 6);
-  clean.folderStructure = clean.folderStructure.slice(0, 12);
   clean.deploymentChecklist = clean.deploymentChecklist.slice(0, 6);
   clean.resumeBullets = clean.resumeBullets.slice(0, 3);
 

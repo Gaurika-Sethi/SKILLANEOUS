@@ -52,6 +52,13 @@ export default function ProjectDetailsPage() {
         console.log("🔍 Raw project data:", raw);
         console.log("🔍 README content:", readmeContent);
 
+        // Accept folder structure as array or newline string
+        const folderArray = Array.isArray(raw.folderStructure)
+          ? raw.folderStructure
+          : raw.folderStructure
+          ? String(raw.folderStructure).split(/\r?\n/).filter(Boolean)
+          : [];
+
         const normalized = {
           // ids
           projectId: raw.projectId || raw._id || projectId,
@@ -68,9 +75,8 @@ export default function ProjectDetailsPage() {
           features: (raw.features || []).map((f: any) =>
             typeof f === "string" ? { title: f, description: "" } : f
           ),
-          folderStructure: Array.isArray(raw.folderStructure)
-            ? raw.folderStructure.join("\n")
-            : raw.folderStructure || "No folder structure available.",
+          folderStructureList: folderArray,
+          folderStructure: folderArray.join("\n") || "No folder structure available.",
           deploymentChecklist: (raw.deploymentChecklist || []).map((item: any) =>
             typeof item === "string" ? { title: item, subtitle: "" } : item
           ),
@@ -281,9 +287,9 @@ export default function ProjectDetailsPage() {
         {/* --- 04. FOLDER STRUCTURE --- */}
         <CollapsibleSection title="Folder Structure" icon={<FolderTree size={20}/>} isOpen={expanded.structure} onToggle={() => toggle('structure')}>
           <div className="relative group">
-            <pre className="p-8 rounded-3xl border-2 overflow-x-auto text-sm font-mono leading-relaxed" style={{ backgroundColor: "rgba(0,0,0,0.3)", borderColor: colors.borderSoft, color: "rgba(200, 200, 210, 1)" }}>
-              {projectData.folderStructure || "No folder structure available."}
-            </pre>
+            <div className="p-6 rounded-3xl border-2 bg-black/30" style={{ borderColor: colors.borderSoft }}>
+              <FolderTreeView paths={projectData.folderStructureList || []} />
+            </div>
             <button 
               onClick={() => copyToClipboard(projectData.folderStructure || '', 'folder')}
               className="absolute top-6 right-6 p-2 rounded-lg bg-white/10 border border-white/10 hover:bg-white/20 transition-all flex items-center gap-2"
@@ -394,6 +400,70 @@ function CollapsibleSection({ title, icon, children, isOpen, onToggle }: any) {
         {isOpen ? <ChevronUp size={24} className="opacity-30" /> : <ChevronDown size={24} className="opacity-30" />}
       </button>
       {isOpen && <div className="p-8 pt-2 border-t border-white/[0.04] animate-in fade-in slide-in-from-top-2 duration-300">{children}</div>}
+    </div>
+  );
+}
+
+type TreeNode = { name: string; isFile: boolean; children: TreeNode[] };
+
+function buildTreeFromPaths(paths: string[]): TreeNode[] {
+  const root: any = {};
+
+  paths.forEach((p) => {
+    const parts = p.split("/").filter(Boolean);
+    let node = root;
+    parts.forEach((part, idx) => {
+      const isLeaf = idx === parts.length - 1;
+      if (!node[part]) {
+        node[part] = { __children: {}, __isFile: isLeaf && part.includes(".") };
+      }
+      node = node[part].__children;
+    });
+  });
+
+  const toArray = (obj: any): TreeNode[] =>
+    Object.entries(obj).map(([key, val]: any) => {
+      const children = val.__children || {};
+      const hasChildren = Object.keys(children).length > 0;
+      return {
+        name: key,
+        isFile: !!(val.__isFile && !hasChildren),
+        children: toArray(children),
+      } as TreeNode;
+    });
+
+  return toArray(root);
+}
+
+function FolderTreeView({ paths }: { paths: string[] }) {
+  const tree: TreeNode[] = buildTreeFromPaths(paths);
+
+  return (
+    <div className="text-sm font-mono leading-relaxed space-y-1">
+      {tree.length === 0 && <p className="opacity-60">No folder structure available.</p>}
+      {tree.map((node: TreeNode, idx: number) => (
+        <FolderNode key={idx} node={node} depth={0} />
+      ))}
+    </div>
+  );
+}
+
+function FolderNode({ node, depth }: any) {
+  const indent = depth * 16;
+  const isDir = node.children && node.children.length > 0;
+  return (
+    <div>
+      <div style={{ paddingLeft: indent }} className="flex items-center gap-2">
+        <span className="text-cyan-300">{isDir ? "📁" : "📄"}</span>
+        <span className="font-semibold">{node.name}</span>
+      </div>
+      {isDir && (
+        <div className="mt-1">
+          {node.children.map((child: any, i: number) => (
+            <FolderNode key={i} node={child} depth={depth + 1} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
