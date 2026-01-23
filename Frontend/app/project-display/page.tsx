@@ -48,6 +48,10 @@ export default function ProjectDetailsPage() {
         // Normalize backend shape to what the UI expects
         const raw = data?.data || {};
 
+        const readmeContent = raw.githubReadmeTemplate || raw.readmeContent || "";
+        console.log("🔍 Raw project data:", raw);
+        console.log("🔍 README content:", readmeContent);
+
         const normalized = {
           // ids
           projectId: raw.projectId || raw._id || projectId,
@@ -71,7 +75,7 @@ export default function ProjectDetailsPage() {
             typeof item === "string" ? { title: item, subtitle: "" } : item
           ),
           resumeHighlights: raw.resumeBullets || raw.resumeHighlights || [],
-          readmeContent: raw.githubReadmeTemplate || raw.readmeContent,
+          readmeContent: readmeContent,
         };
 
         setProjectData(normalized);
