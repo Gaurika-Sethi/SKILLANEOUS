@@ -353,7 +353,7 @@ export default function RoadmapView({
 
       const fileName = `${roadmap.title.replace(/\s+/g, "_")}_roadmap`;
 
-      if (selectedFormat === "png" || selectedFormat === "jpg") {
+      /* if (selectedFormat === "png" || selectedFormat === "jpg") {
         const imgData = canvas.toDataURL(`image/${selectedFormat}`);
         const link = document.createElement("a");
         link.href = imgData;
@@ -370,7 +370,7 @@ export default function RoadmapView({
         });
         pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
         pdf.save(`${fileName}.pdf`);
-      }
+      } */
     } catch (error) {
       console.error("Download failed:", error);
     }
