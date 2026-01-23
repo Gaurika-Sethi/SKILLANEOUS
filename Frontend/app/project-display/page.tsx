@@ -378,6 +378,8 @@ export default function ProjectDetailsPage() {
   );
 }
 
+export const dynamic = "force-dynamic";
+
 // --- INTERNAL COMPONENTS ---
 
 function MetaItem({ label, value }: { label: string, value: string }) {
