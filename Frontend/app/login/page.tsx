@@ -1,8 +1,11 @@
 'use client';
 import React, { useState } from 'react';
 import { Mail, Lock, Eye, EyeOff, ShieldCheck,} from 'lucide-react';
-
-const LoginPage = ({ onSkip, onLogin }) => {
+type LoginPageProps = {
+ onSkip?: () => void;
+  onLogin?: (email: string, password: string) => void;
+};
+const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
