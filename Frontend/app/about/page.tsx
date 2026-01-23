@@ -125,7 +125,7 @@ export default function AboutPage() {
             <div className="flex flex-col md:flex-row-reverse items-center gap-12 group">
               <div className="w-full md:w-1/2 aspect-square rounded-3xl overflow-hidden">
                 <img 
-                  src="./rishi_pic.jpg" 
+                  src="./rishi_pic.png" 
                   alt="Rishi Raj Goel"
                   className="w-full h-full object-cover opacity-100"
                 />
