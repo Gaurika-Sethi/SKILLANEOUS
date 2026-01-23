@@ -1,55 +1,118 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
-import LoginPage from "./login";
-import ThemeSelection from "./resume";
-export default function Navbar() {
-  return (
-    <nav className="fixed top-0 w-full z-50 bg-[#0a0a0c] backdrop-blur-md border-b border-white/10">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+import React, { useState, useEffect } from "react";
+import { Boxes, Menu, X, ChevronRight, UserCircle } from "lucide-react";
 
-        {/* Left: Logo + Text */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.png"
-            alt="Skillaneous Logo"
-            width={36}
-            height={36}
-            priority
-          />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#837FA4] via-[#7EA9AC] to-[#C390D4]">
+export default function SkillaneousNavbar() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const navLinks = [
+    { name: "Create Roadmap", href: "/roadmap-form" },
+    { name: "Project Suggestion", href: "/project-form" },
+    { name: "Resume Generator", href: "/resume-form" },
+    { name: "About", href: "/about" },
+  ];
+
+  return (
+    <nav 
+      className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 px-6 py-4 ${
+        isScrolled ? "bg-black/40 backdrop-blur-xl" : "bg-transparent"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        
+        {/* --- LOGO & BRAND --- */}
+        <a 
+          href="/" 
+          className="flex items-center gap-3 group transition-transform active:scale-95"
+        >
+          <div className="">
+            <img
+              src="/logo.png"
+              alt="Skillaneous logo"
+              className="h-12 w-12 object-contain"
+            />
+          </div>
+          <span 
+            className="text-2xl font-black uppercase tracking-tighter"
+            style={{
+              backgroundImage: "linear-gradient(135deg, #837FA4 0%, #7EA9AC 40%, #C390D4 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+            }}
+          >
             SKILLANEOUS
           </span>
-        </Link>
+        </a>
 
-        {/* Right: Buttons */}
+        {/* --- DESKTOP NAVIGATION --- */}
+        <div className="hidden lg:flex items-center gap-1">
+          {navLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              className="px-5 py-2 text-[14px] font-black uppercase tracking-[0.15em] text-white/50 hover:text-cyan-400 transition-colors relative group"
+            >
+              {link.name}
+              <span className="absolute bottom-0 left-1/2 w-0 h-px bg-cyan-500 transition-all duration-300 group-hover:w-1/2 group-hover:left-1/4" />
+            </a>
+          ))}
+        </div>
+
+        {/* --- ACTIONS --- */}
         <div className="flex items-center gap-4">
-
-          {/* Build Resume */}
-          <Link
-            href="/resume"
-            className="px-4 py-2 rounded-full border border-white/20 text-white text-sm bg-gradient-to-r from-cyan-400/15 via-purple-400/15 to-pink-500/15 hover:from-cyan-400/30 hover:via-purple-400/30 hover:to-pink-500/30 hover:shadow-[0_0_14px_rgba(138,216,237,0.7)] transition-all duration-300 ease-in-out"
-          >
-            BUILD RESUME
-          </Link>
-
-          {/* Login (Reference Button) */}
-          <Link
+          <a 
             href="/login"
-            className="px-4 py-2 rounded-full border border-white/20 text-white text-sm bg-gradient-to-r from-cyan-400/15 via-purple-400/15 to-pink-500/15 hover:from-cyan-400/30 hover:via-purple-400/30 hover:to-pink-500/30 hover:shadow-[0_0_14px_rgba(138,216,237,0.7)] transition-all duration-300 ease-in-out"
+            className="hidden sm:flex items-center gap-2 px-6 py-2.5 rounded-xl font-black uppercase text-[14px] tracking-widest border border-white/10 bg-white/5 hover:bg-white hover:text-black transition-all active:scale-95"
           >
-            LOGIN
-          </Link>
+            <UserCircle size={20} />
+            Login
+          </a>
 
-          {/* Start My Path (Same Style as Login) */}
-          <Link
-            href="/path"
-            className="px-4 py-2 rounded-full border border-white/20 text-white text-sm bg-gradient-to-r from-cyan-400/15 via-purple-400/15 to-pink-500/15 hover:from-cyan-400/30 hover:via-purple-400/30 hover:to-pink-500/30 hover:shadow-[0_0_14px_rgba(138,216,237,0.7)] transition-all duration-300 ease-in-out"
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="lg:hidden p-2 text-white/70 hover:text-white"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
-            START MY PATH
-          </Link>
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
+      </div>
 
+      {/* --- MOBILE OVERLAY --- */}
+      <div 
+        className={`fixed inset-0 bg-black/95 backdrop-blur-2xl z-[99] lg:hidden transition-all duration-500 ${
+          isMobileMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full pointer-events-none"
+        }`}
+      >
+        <div className="flex flex-col items-center justify-center h-full space-y-8 p-6 text-center">
+          {navLinks.map((link) => (
+            <a
+              key={link.name}
+              href={link.href}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="text-3xl font-black uppercase tracking-tighter text-white hover:text-cyan-400 flex items-center gap-4 transition-colors"
+            >
+              {link.name}
+              <ChevronRight className="text-cyan-500" />
+            </a>
+          ))}
+          <div className="w-full h-px bg-white/10 max-w-[200px]" />
+          <a 
+            href="/login"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-full max-w-xs py-5 rounded-2xl bg-white text-black font-black uppercase tracking-widest text-center"
+          >
+            Login to Portal
+          </a>
         </div>
       </div>
     </nav>
