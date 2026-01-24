@@ -26,8 +26,8 @@ export default function RoadmapsPage() {
   async function load() {
     try {
       const baseUrl =
-        process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-        "http://localhost:8000";
+        process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+        "https://skillaneous.onrender.com";
 
       const res = await fetch(`${baseUrl}/api/v1/roadmap/curated`, {
         method: "POST",

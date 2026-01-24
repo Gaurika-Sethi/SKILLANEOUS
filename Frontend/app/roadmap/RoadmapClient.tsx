@@ -37,8 +37,8 @@ useEffect(() => {
       // ✅ CASE 1: Curated roadmap (fetch from DB)
       if (source === "curated" && id) {
         const baseUrl =
-          process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-          "http://localhost:8000";
+          process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+          "https://skillaneous.onrender.com";
 
         const res = await fetch(`${baseUrl}/api/v1/roadmap/${id}`, {
           method: "POST",

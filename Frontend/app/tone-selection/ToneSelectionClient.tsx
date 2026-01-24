@@ -56,7 +56,7 @@ export default function ToneSelection() {
 
   try {
     const res = await fetch(
-      "http://localhost:8000/api/v1/resume/generate-ai",
+      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/resume/generate-ai`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

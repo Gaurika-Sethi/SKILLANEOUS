@@ -136,8 +136,8 @@ export default function RoadmapView({
     }
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-      "http://localhost:8000";
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      "https://skillaneous.onrender.com";
 
     const url = `${baseUrl}/api/v1/roadmap/topic-summary`;
 
@@ -217,8 +217,8 @@ export default function RoadmapView({
     }
 
     const baseUrl =
-      process.env.NEXT_PUBLIC_BACKEND_URL?.replace(/\/$/, "") ||
-      "http://localhost:8000";
+      process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, "") ||
+      "https://skillaneous.onrender.com";
 
     const url = `${baseUrl}/api/v1/roadmap/subtopic-details`;
 

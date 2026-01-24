@@ -117,7 +117,7 @@ const handleSubmit = async () => {
   console.log("✅ Submitting payload:", payload);
 
   try {
-    const res = await fetch("http://localhost:8000/api/v1/projects/generate", {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -144,7 +144,7 @@ const handleSubmit = async () => {
 };
 
 const handleRegenerate = async (requestId: string) => {
-  const res = await fetch(`http://localhost:5000/api/projects/${requestId}/regenerate`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${requestId}/regenerate`, {
     method: "POST",
   });
 
