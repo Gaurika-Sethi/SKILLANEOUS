@@ -105,7 +105,7 @@ export default function RoadmapForm() {
     if (!roadmapRequestId) throw new Error("roadmapRequestId missing from response");
 
     // 2️⃣ Generate roadmap (AI)
-    const genRes = await fetch("http://localhost:8000/api/v1/roadmap/generate-roadmap", {
+    const genRes = await fetch("https://skillaneous-1.onrender.com/api/v1/roadmap/generate-roadmap", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roadmapRequestId }),
