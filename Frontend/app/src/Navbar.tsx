@@ -16,7 +16,7 @@ export default function SkillaneousNavbar() {
   const navLinks = [
     { name: "Create Roadmap", href: "/roadmap-form" },
     { name: "Project Suggestion", href: "/project-form" },
-    { name: "Resume Generator", href: "/resume-form" },
+    { name: "Resume Generator", href: "/resume" },
     { name: "About", href: "/about" },
   ];
 
