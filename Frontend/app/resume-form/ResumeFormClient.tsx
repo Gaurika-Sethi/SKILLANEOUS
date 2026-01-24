@@ -126,6 +126,8 @@ export default function ResumeFormClient() {
     formData.append("photo", photo);
   }
 
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+
   const res = await fetch(`https://skillaneous.onrender.com/api/v1/resume/create-data`, {
     method: "POST",
     body: formData,
