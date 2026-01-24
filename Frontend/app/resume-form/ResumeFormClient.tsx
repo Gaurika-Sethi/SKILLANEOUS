@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Upload, Plus, Trash2, AlertCircle } from "lucide-react";
@@ -61,7 +63,6 @@ export default function ResumeFormClient() {
 
   const handleGenerate = async () => {
   console.log("🚀 Generate button clicked");
-  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
   setShowErrors(true);
   if (!isFormValid()) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -129,7 +130,7 @@ export default function ResumeFormClient() {
 
   
 
-  const res = await fetch(`https://skillaneous.onrender.com/api/v1/resume/create-data`, {
+  const res = await fetch(`${API_BASE_URL}/api/v1/resume/create-data`, {
     method: "POST",
     body: formData,
   });
