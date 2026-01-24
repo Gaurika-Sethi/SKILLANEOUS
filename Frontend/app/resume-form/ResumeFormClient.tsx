@@ -61,6 +61,7 @@ export default function ResumeFormClient() {
 
   const handleGenerate = async () => {
   console.log("🚀 Generate button clicked");
+  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
   setShowErrors(true);
   if (!isFormValid()) {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -126,7 +127,7 @@ export default function ResumeFormClient() {
     formData.append("photo", photo);
   }
 
-  console.log("API URL:", process.env.NEXT_PUBLIC_API_URL);
+  
 
   const res = await fetch(`https://skillaneous.onrender.com/api/v1/resume/create-data`, {
     method: "POST",
