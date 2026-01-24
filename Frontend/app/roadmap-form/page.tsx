@@ -91,77 +91,58 @@ export default function RoadmapForm() {
   try {
     // 1️⃣ Create roadmap request
     const reqRes = await fetch("http://localhost:8000/api/v1/roadmap/create-data", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify(payload),
-});
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
 
-const reqText = await reqRes.text();
-console.log("CREATE-DATA RAW:", reqText);
+    const reqText = await reqRes.text();
+    let reqData = JSON.parse(reqText);
 
-let reqData;
-try {
-  reqData = JSON.parse(reqText);
-} catch {
-  throw new Error("Create-data did not return JSON");
-}
+    if (!reqRes.ok) throw new Error(reqData.message || "Create roadmap request failed");
 
-if (!reqRes.ok) {
-  throw new Error(reqData.message || "Create roadmap request failed");
-}
-
-const roadmapRequestId = reqData?.data?._id;
-
-if (!roadmapRequestId) {
-  throw new Error("roadmapRequestId missing from response");
-}
+    const roadmapRequestId = reqData?.data?._id;
+    if (!roadmapRequestId) throw new Error("roadmapRequestId missing from response");
 
     // 2️⃣ Generate roadmap (AI)
     const genRes = await fetch("http://localhost:8000/api/v1/roadmap/generate-roadmap", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ roadmapRequestId }),
-});
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ roadmapRequestId }),
+    });
 
-const genText = await genRes.text();
-console.log("GENERATE RAW:", genText);
+    const genText = await genRes.text();
+    let genData = JSON.parse(genText);
 
-let genData;
-try {
-  genData = JSON.parse(genText);
-} catch {
-  throw new Error("Generate-roadmap did not return JSON");
-}
+    if (!genRes.ok) throw new Error(genData.message || "Failed to generate roadmap");
 
-if (!genRes.ok) {
-  throw new Error(genData.message || "Failed to generate roadmap");
-}
+    // 3️⃣ Get structured roadmap
+    const roadmapJson = genData?.data?.structured;
 
-// 3️⃣ Validate roadmap structure from AI
-const roadmapJson = genData?.data;
+    if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
+      throw new Error("Invalid roadmap JSON structure - missing title or phases");
+    }
 
-if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
-  throw new Error("Invalid roadmap JSON structure - missing title or phases");
-}
+    // 4️⃣ Convert backend format to frontend format
+    const roadmapForDisplay = {
+      title: roadmapJson.title,
+      roadmapRequestId,
+      sections: roadmapJson.phases.map((phase: any) => ({
+        id: phase.id,
+        label: phase.label,
+        topics: phase.topics || [],
+      })),
+    };
 
-// 4️⃣ Convert backend format (phases) to frontend format (sections)
-const roadmapForDisplay = {
-  title: roadmapJson.title,
-  roadmapRequestId, // ✅ IMPORTANT ADD THIS
-  sections: roadmapJson.phases.map((phase: any) => ({
-    id: phase.id,
-    label: phase.label,
-    topics: phase.topics || [],
-  })),
-};
+    // ✅ 5️⃣ SAVE TO SESSION STORAGE BEFORE NAVIGATING
+    sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
+    sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
 
+    // ⏳ Give browser a tick to commit storage (prevents race condition)
+    setTimeout(() => {
+      router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
+    }, 50);
 
-console.log("🚀 ROADMAP JSON:", roadmapForDisplay);
-sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
-sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
-
-// 5️⃣ Navigate
-router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
   } catch (err) {
     console.error(err);
     setIsLoading(false);

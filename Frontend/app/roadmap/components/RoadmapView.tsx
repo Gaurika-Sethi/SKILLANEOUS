@@ -521,8 +521,9 @@ export default function RoadmapView({
 
       {/* Sliding Side Panel */}
       <div
-        className={`fixed top-0 right-0 h-full w-full md:w-[500px] bg-[rgba(10,10,10,1)] border-l border-[rgba(255,255,255,0.1)] shadow-2xl transform transition-transform duration-500 ease-in-out z-50 ${selectedSubtopic ? "translate-x-0" : "translate-x-full"
+        className={`fixed right-0 h-full w-full md:w-[500px] bg-[rgba(10,10,10,1)] border-l border-[rgba(255,255,255,0.1)] shadow-2xl transform transition-transform duration-500 ease-in-out z-50 ${selectedSubtopic ? "translate-x-0" : "translate-x-full"
           }`}
+        style={{ top: "72px", height: "calc(100vh - 72px)" }}
       >
         {selectedSubtopic && (
           <div className="h-full flex flex-col">
@@ -659,7 +660,8 @@ export default function RoadmapView({
       {/* Overlay for mobile */}
       {selectedSubtopic && (
         <div
-          className="fixed inset-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-sm z-40 md:hidden"
+          className="fixed inset-x-0 bg-[rgba(0,0,0,0.6)] backdrop-blur-sm z-40 md:hidden"
+          style={{ top: "72px", height: "calc(100vh - 72px)" }}
           onClick={() => setSelectedSubtopic(null)}
         />
       )}
