@@ -5,8 +5,41 @@ import { Mail, Linkedin, Send, MessageSquare, Users, Heart } from "lucide-react"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
 
   const inputClass = "w-full bg-[#262626]/50 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-purple-500/50 transition-all placeholder:text-gray-600";
+
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!formData.name || !formData.email || !formData.message) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  try {
+    setStatus("sending");
+
+    const res = await fetch("https://formspree.io/f/xayzabcd", { // 🔥 replace with your endpoint
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    if (res.ok) {
+      setStatus("success");
+      setFormData({ name: "", email: "", message: "" });
+    } else {
+      setStatus("error");
+    }
+  } catch (err) {
+    console.error(err);
+    setStatus("error");
+  }
+};
 
   return (
     <div className="min-h-screen bg-black text-white px-6 py-20 font-sans selection:bg-purple-500/30">
@@ -28,7 +61,7 @@ export default function ContactPage() {
               Send a Message
             </h2>
             
-            <form className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Name <span className="text-pink-500">*</span></label>
                 <input 
@@ -44,7 +77,7 @@ export default function ContactPage() {
                 <label className="text-sm font-bold text-gray-400 uppercase tracking-widest">Email <span className="text-pink-500">*</span></label>
                 <input 
                   type="email" 
-                  placeholder="your@email.com" 
+                  placeholder="gaurikasethi88@gmail.com" 
                   className={inputClass}
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
@@ -62,9 +95,26 @@ export default function ContactPage() {
                 />
               </div>
 
-              <button className="w-full py-4 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-black font-black rounded-xl hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2">
-                Send Message <Send size={18} />
+              <button
+                  type="submit"
+                  disabled={status === "sending"}
+                  className="w-full py-4 bg-gradient-to-r from-cyan-400 via-purple-400 to-pink-400 text-black font-black rounded-xl hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {status === "sending" ? "Sending..." : "Send Message"}
+                    <Send size={18} />
               </button>
+
+              {status === "success" && (
+                <p className="text-green-400 text-sm font-medium">
+                  Message sent successfully! We'll get back to you soon 💌
+                </p>
+              )}
+
+              {status === "error" && (
+                <p className="text-red-400 text-sm font-medium">
+                  Something went wrong. Please try again later.
+                </p>
+              )}
             </form>
           </section>
 
