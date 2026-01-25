@@ -125,20 +125,19 @@ export default function RoadmapForm() {
       throw new Error("Invalid roadmap JSON structure - missing title or phases");
     }
 
-    // 4️⃣ Convert backend format to frontend format
-    const roadmapForDisplay = {
-      title: roadmapJson.title,
-      roadmapRequestId,
-      sections: roadmapJson.phases.map((phase: any) => ({
-        id: phase.id,
-        label: phase.label,
-        topics: phase.topics || [],
-      })),
-    };
+// ✅ 4️⃣ Convert backend format to frontend format & SAVE TO SESSION STORAGE BEFORE NAVIGATING
+const roadmapForDisplay = {
+  title: roadmapJson.title,
+  roadmapRequestId,
+  sections: roadmapJson.phases.map((phase: any) => ({
+    id: phase.id,
+    label: phase.label,
+    topics: phase.topics || [],
+  })),
+};
 
-    // ✅ 5️⃣ SAVE TO SESSION STORAGE BEFORE NAVIGATING
-    sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
-    sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
+sessionStorage.setItem("roadmap_json", JSON.stringify(roadmapForDisplay));
+sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
 
     // ⏳ Give browser a tick to commit storage (prevents race condition)
     setTimeout(() => {
