@@ -42,8 +42,8 @@ export default function ProjectDetailsClient() {
 
       try {
         
-console.log("FINAL URL:", `${API}/projects/${projectId}`);
-const response = await fetch(`${API}/projects/${projectId}`);
+console.log("FINAL URL:", `${API}/api/v1/projects/${projectId}`);
+const response = await fetch(`${API}/api/v1/projects/${projectId}`);
     
         if (!response.ok) {
           const text = await response.text();
@@ -167,7 +167,7 @@ const response = await fetch(`${API}/projects/${projectId}`);
     setRegenError(null);
 
     try {
-      const res = await fetch(`${API}/projects/${requestIdForRegen}/regenerate`, {
+      const res = await fetch(`${API}/api/v1/projects/${requestIdForRegen}/regenerate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
