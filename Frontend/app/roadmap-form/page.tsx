@@ -142,7 +142,7 @@ export default function RoadmapForm() {
 
     // ⏳ Give browser a tick to commit storage (prevents race condition)
     setTimeout(() => {
-      router.push(`/project-display?id=${roadmapRequestId}`);
+      router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
     }, 50);
 
   } catch (err) {
