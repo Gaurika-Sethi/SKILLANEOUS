@@ -1,5 +1,6 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
  
@@ -91,14 +92,14 @@ export default function RoadmapForm() {
 
   try {
     // 1️⃣ Create roadmap request
-    const reqRes = await fetch(`https://skillaneous.onrender.com/api/v1/roadmap/create-data`, {
+    const reqRes = await fetch(`${API_BASE_URL}/api/v1/roadmap/create-data`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
 
     const reqText = await reqRes.text();
-    let reqData = JSON.parse(reqText);
+    const reqData = JSON.parse(reqText);
 
     if (!reqRes.ok) throw new Error(reqData.message || "Create roadmap request failed");
 
@@ -106,14 +107,14 @@ export default function RoadmapForm() {
     if (!roadmapRequestId) throw new Error("roadmapRequestId missing from response");
 
     // 2️⃣ Generate roadmap (AI)
-    const genRes = await fetch(`https://skillaneous.onrender.com/api/v1/roadmap/generate-roadmap`, {
+    const genRes = await fetch(`${API_BASE_URL}/api/v1/roadmap/generate-roadmap`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ roadmapRequestId }),
     });
 
     const genText = await genRes.text();
-    let genData = JSON.parse(genText);
+    const genData = JSON.parse(genText);
 
     if (!genRes.ok) throw new Error(genData.message || "Failed to generate roadmap");
 
