@@ -20,7 +20,7 @@ export default function ContactPage() {
   try {
     setStatus("sending");
 
-    const res = await fetch("https://formspree.io/f/mwvldwqw", { // 🔥 replace with your endpoint
+    const res = await fetch("https://formspree.io/f/mwvldwqw", { 
       method: "POST",
       headers: {
         "Content-Type": "application/json",
