@@ -52,6 +52,10 @@ const attachIdsToRoadmap = (structured) => {
 };
 
 const generateRoadmap = asyncHandler(async (req, res) => {
+  return res.status(200).json({
+  ok: true,
+  msg: "Reached generateRoadmap without AI or DB",
+});
   console.log("🔥 ROADMAP ROUTE USING GROQ");
   console.log("🧠 generateRoadmap HIT");
 
@@ -75,9 +79,10 @@ const generateRoadmap = asyncHandler(async (req, res) => {
   });
 
   // 3️⃣ Call AI
+  const model = "llama-3.1-8b-instant";
   const aiRaw = await generateFromAI({
     prompt,
-    model: "llama-3.1-8b-instant",
+    model,
     temperature: 0.2,
   });
 
