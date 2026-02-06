@@ -115,6 +115,7 @@ export default function RoadmapForm() {
 
     const genText = await genRes.text();
     const genData = JSON.parse(genText);
+    console.log("GEN DATA FULL:", genData);
 
     if (!genRes.ok) throw new Error(genData.message || "Failed to generate roadmap");
 
