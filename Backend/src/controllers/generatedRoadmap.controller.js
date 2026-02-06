@@ -52,10 +52,6 @@ const attachIdsToRoadmap = (structured) => {
 };
 
 const generateRoadmap = asyncHandler(async (req, res) => {
-  return res.status(200).json({
-  ok: true,
-  msg: "Reached generateRoadmap without AI or DB",
-});
   console.log("🔥 ROADMAP ROUTE USING GROQ");
   console.log("🧠 generateRoadmap HIT");
 
