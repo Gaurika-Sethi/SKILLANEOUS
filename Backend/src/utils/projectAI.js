@@ -8,7 +8,7 @@ const generateProjectWithAI = async (payload) => {
 
   const text = await generateFromAI({
     prompt,
-    model: "gpt-4o-mini",
+    model: "llama-3.1-8b-instant",
     temperature: 0.3,
     max_tokens: 2500,
     json: true,
@@ -53,9 +53,9 @@ const generateProjectWithAI = async (payload) => {
   return {
     generatedProject: parsed,
     ai_metadata: {
-      provider: "openai",
-      model: "gpt-4o-mini",
-      temperature: 0.3,
+      provider: "groq",
+      model: "llama-3.1-8b-instant",
+      temperature: 0.2,
       prompt_version: "v1",
     },
   };

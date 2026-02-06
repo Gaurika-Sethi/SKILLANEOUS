@@ -51,7 +51,7 @@ const generatedRoadmapSchema = new mongoose.Schema(
 
 
     ai_metadata: {
-      provider: { type: String, default: "openai" },
+      provider: { type: String, default: "groq" },
       model: String,
       temperature: Number,
       prompt_version: String,

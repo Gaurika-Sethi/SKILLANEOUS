@@ -32,7 +32,7 @@ const generateResume = asyncHandler(async (req, res) => {
         });
 
         console.log("Calling AI");
-        const model = "gpt-4o-mini";
+        const model = "llama-3.1-8b-instant";
     
         const aiRaw = await generateFromAI({
             prompt,
@@ -66,11 +66,12 @@ const generateResume = asyncHandler(async (req, res) => {
             tone: tone || "professional",
             content: normalized,
             ai_metadata: {
-                provider: "openai",
+                provider: "groq",
                 model,
                 prompt_version: "v1",
                 temperature: 0.2,
             },
+
         });
     
         console.log("PHOTO URL IN NORMALIZED:", normalized?.personalInfo?.photoUrl);

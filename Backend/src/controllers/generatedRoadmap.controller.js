@@ -76,7 +76,7 @@ const generateRoadmap = asyncHandler(async (req, res) => {
   // 3️⃣ Call AI
   const aiRaw = await generateFromAI({
     prompt,
-    model: "gpt-4o-mini",
+    model: "llama-3.1-8b-instant",
     temperature: 0.3,
     json: true,
   });
@@ -109,11 +109,12 @@ const generateRoadmap = asyncHandler(async (req, res) => {
       structured: structuredRoadmap,
       visibility: roadmapRequest.visibility,
       ai_metadata: {
-        provider: "openai",
-        model: "gpt-4o-mini",
-        temperature: 0.3,
-        prompt_version: "v2-json",
+        provider: "groq",
+        model,
+        prompt_version: "v1",
+        temperature: 0.2,
       },
+
     },
     { upsert: true, new: true }
   );
