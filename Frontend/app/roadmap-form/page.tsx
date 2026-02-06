@@ -115,12 +115,12 @@ export default function RoadmapForm() {
 
     const genText = await genRes.text();
     const genData = JSON.parse(genText);
-    console.log("GEN DATA FULL:", genData);
 
     if (!genRes.ok) throw new Error(genData.message || "Failed to generate roadmap");
 
     // 3️⃣ Get structured roadmap
     const roadmapJson = genData?.data?.structured;
+    console.log("GEN DATA FULL:", genData);
 
     if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
       throw new Error("Invalid roadmap JSON structure - missing title or phases");
