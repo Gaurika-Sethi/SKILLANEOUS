@@ -96,6 +96,7 @@ export default function RoadmapForm() {
   };
 
   const handleSubmitRoadmap = async () => {
+    console.log("API_BASE_URL =", API_BASE_URL);
     console.log("SUBMIT CLICKED");
 
     setShowErrors(true);
