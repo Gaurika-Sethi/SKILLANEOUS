@@ -1,13 +1,22 @@
-import puppeteer from "puppeteer-core";
+import puppeteer from "puppeteer";
+import puppeteerCore from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
 const generatePdfFromHtml = async (html) => {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    defaultViewport: chromium.defaultViewport, 
-  });
+  const isServerless = Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.VERCEL);
+  const puppeteerLib = isServerless ? puppeteerCore : puppeteer;
+  const launchOptions = isServerless
+    ? {
+        args: chromium.args,
+        executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        defaultViewport: chromium.defaultViewport,
+      }
+    : {
+        headless: "new",
+      };
+
+  const browser = await puppeteerLib.launch(launchOptions);
 
   try {
     const page = await browser.newPage();
