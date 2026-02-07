@@ -67,6 +67,31 @@ const response = await fetch(`${API}/api/v1/projects/${projectId}`);
           ? String(raw.folderStructure).split(/\r?\n/).filter(Boolean)
           : [];
 
+        const rawChecklist =
+          raw.deploymentChecklist ??
+          raw.deployment_checklist ??
+          raw.deploymentSteps ??
+          raw.deployment_steps ??
+          raw.deploymentPlan;
+        const checklistArray = Array.isArray(rawChecklist)
+          ? rawChecklist
+          : rawChecklist
+          ? String(rawChecklist)
+              .split(/\r?\n|•|-/)
+              .map((s) => s.trim())
+              .filter(Boolean)
+          : [];
+        const normalizedChecklist = checklistArray
+          .map((item: any) =>
+            typeof item === "string"
+              ? { title: item, subtitle: "" }
+              : {
+                  title: item.title || item.step || item.name || item.text || "",
+                  subtitle: item.subtitle || item.detail || item.notes || "",
+                }
+          )
+          .filter((item: any) => item.title);
+
         const normalized = {
           // ids
           projectId: raw.projectId || raw._id || projectId,
@@ -85,9 +110,7 @@ const response = await fetch(`${API}/api/v1/projects/${projectId}`);
           ),
           folderStructureList: folderArray,
           folderStructure: folderArray.join("\n") || "No folder structure available.",
-          deploymentChecklist: (raw.deploymentChecklist || []).map((item: any) =>
-            typeof item === "string" ? { title: item, subtitle: "" } : item
-          ),
+          deploymentChecklist: normalizedChecklist,
           resumeHighlights: raw.resumeBullets || raw.resumeHighlights || [],
           readmeContent: readmeContent,
         };
