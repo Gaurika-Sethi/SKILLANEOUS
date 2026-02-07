@@ -28,6 +28,7 @@ export default function RoadmapForm() {
   const router = useRouter();
   const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [roadmapError, setRoadmapError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     fieldToWorkIn: "",
@@ -70,10 +71,42 @@ export default function RoadmapForm() {
 
 
 
+  const safeJsonParse = (value: string) => {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return null;
+    }
+  };
+
+  const extractJsonFromText = (value: string) => {
+    const start = value.indexOf("{");
+    const end = value.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      return safeJsonParse(value.slice(start, end + 1));
+    }
+    return null;
+  };
+
+  const parseMaybeJson = (value: unknown) => {
+    if (typeof value === "string") {
+      return safeJsonParse(value) ?? extractJsonFromText(value);
+    }
+    return value;
+  };
+
   const handleSubmitRoadmap = async () => {
+    console.log("SUBMIT CLICKED");
+
+    setShowErrors(true);
+    console.log("FORM VALID?", isFormValid(), formData);
+    
+    if (!isFormValid()) return;
+
   setShowErrors(true);
   if (!isFormValid()) return;
 
+  setRoadmapError(null);
   setIsLoading(true);
 
   const payload = {
@@ -90,6 +123,8 @@ export default function RoadmapForm() {
     visibility: formData.visibility,
   };
 
+  console.log("PAYLOAD:", payload);
+
   try {
     // 1️⃣ Create roadmap request
     const reqRes = await fetch(`${API_BASE_URL}/api/v1/roadmap/create-data`, {
@@ -99,7 +134,8 @@ export default function RoadmapForm() {
     });
 
     const reqText = await reqRes.text();
-    const reqData = JSON.parse(reqText);
+    const reqData = safeJsonParse(reqText);
+    if (!reqData) throw new Error("Unexpected response from server");
 
     if (!reqRes.ok) throw new Error(reqData.message || "Create roadmap request failed");
 
@@ -114,23 +150,73 @@ export default function RoadmapForm() {
     });
 
     const genText = await genRes.text();
-    const genData = JSON.parse(genText);
+console.log("GEN TEXT RAW:", genText);
 
-    if (!genRes.ok) throw new Error(genData.message || "Failed to generate roadmap");
+const looksLikeHtml = genText.trim().startsWith("<!DOCTYPE html") || genText.includes("<html");
+if (looksLikeHtml) {
+  console.warn("Generate roadmap returned HTML. Check API base URL:", API_BASE_URL);
+  setRoadmapError("API_BASE_URL is pointing to the frontend. Update NEXT_PUBLIC_API_URL to your backend (e.g. http://localhost:8000)." );
+  setIsLoading(false);
+  return;
+}
+
+const genData = safeJsonParse(genText);
+const normalizedGenData = parseMaybeJson(genData);
+const genDataObject = normalizedGenData && typeof normalizedGenData === "object" ? normalizedGenData : null;
+console.log("GEN DATA PARSED:", genDataObject ?? genData);
+
+if (!genDataObject) throw new Error("Unexpected response from server");
+
+console.log("GEN DATA KEYS:", Object.keys(genDataObject));
+console.log("GEN DATA.data:", (genDataObject as any).data);
+
+
+  if (!genRes.ok) throw new Error((genDataObject as any).message || "Failed to generate roadmap");
+  console.log("GEN DATA FULL:", genDataObject);
 
     // 3️⃣ Get structured roadmap
-    const roadmapJson = genData?.data?.structured;
-    console.log("GEN DATA FULL:", genData);
+    const rawRoadmap =
+      (genDataObject as any)?.data?.structured ??
+      (genDataObject as any)?.data?.roadmap ??
+      (genDataObject as any)?.structured ??
+      (genDataObject as any)?.data?.data?.structured ??
+      (genDataObject as any)?.data?.data?.roadmap ??
+      ((genDataObject as any)?.data?.title || (genDataObject as any)?.data?.phases ? (genDataObject as any).data : null);
+    const parsedRoadmap = parseMaybeJson(rawRoadmap);
+    console.log("GEN DATA FULL:", genDataObject);
 
-    if (!roadmapJson?.title || !Array.isArray(roadmapJson?.phases)) {
-      throw new Error("Invalid roadmap JSON structure - missing title or phases");
+    if (!parsedRoadmap || typeof parsedRoadmap !== "object") {
+      console.warn("Roadmap payload malformed:", rawRoadmap);
+      setRoadmapError("We couldn't read the roadmap data. Please try again.");
+      setIsLoading(false);
+      return;
+    }
+
+    const roadmapJson = parsedRoadmap as any;
+    const roadmapTitle = typeof roadmapJson.title === "string" ? roadmapJson.title.trim() : "";
+    // TEMP: backend may return `sections` instead of `phases`
+    const phases = roadmapJson.phases ?? roadmapJson.sections;
+    const roadmapPhases = Array.isArray(phases) ? phases : null;
+
+    if (!roadmapTitle || !Array.isArray(roadmapPhases)) {
+      console.warn("Roadmap JSON shape mismatch:", roadmapJson);
+      setRoadmapError("Roadmap data is incomplete. Please try again or adjust your inputs.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (roadmapPhases.length === 0) {
+      console.warn("Roadmap phases empty:", roadmapJson);
+      setRoadmapError("Roadmap generated but contains no phases. Please try again.");
+      setIsLoading(false);
+      return;
     }
 
 // ✅ 4️⃣ Convert backend format to frontend format & SAVE TO SESSION STORAGE BEFORE NAVIGATING
 const roadmapForDisplay = {
-  title: roadmapJson.title,
+  title: roadmapTitle,
   roadmapRequestId,
-  sections: roadmapJson.phases.map((phase: any) => ({
+  sections: roadmapPhases.map((phase: any) => ({
     id: phase.id,
     label: phase.label,
     topics: phase.topics || [],
@@ -145,10 +231,10 @@ sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
       router.push(`/roadmap?roadmapRequestId=${roadmapRequestId}&visibility=${formData.visibility}`);
     }, 50);
 
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
     setIsLoading(false);
-    alert("Server error while creating roadmap");
+    setRoadmapError(err?.message || "Server error while creating roadmap");
   }
 };
 
@@ -371,6 +457,12 @@ sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
               </>
             )}
           </button>
+          {roadmapError && (
+            <div className="mt-4 flex items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              <AlertCircle size={18} className="mt-0.5" />
+              <span>{roadmapError}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
