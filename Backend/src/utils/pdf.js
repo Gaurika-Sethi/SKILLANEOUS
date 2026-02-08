@@ -3,7 +3,12 @@ import puppeteerCore from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
 
 const generatePdfFromHtml = async (html) => {
-  const isServerless = Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME || process.env.VERCEL);
+  const isServerless = Boolean(
+    process.env.AWS_LAMBDA_FUNCTION_NAME ||
+      process.env.VERCEL ||
+      process.env.RENDER ||
+      process.env.RENDER_EXTERNAL_URL
+  );
   const puppeteerLib = isServerless ? puppeteerCore : puppeteer;
   const launchOptions = isServerless
     ? {
