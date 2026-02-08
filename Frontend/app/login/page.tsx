@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { API_BASE_URL } from "@/lib/api";
 import { Mail, Lock, Eye, EyeOff, ShieldCheck,} from 'lucide-react';
 type LoginPageProps = {
  onSkip?: () => void;
@@ -9,6 +10,10 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const handleGoogleSignIn = () => {
+    window.location.href = `${API_BASE_URL}/api/v1/users/auth/google`;
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0c] flex flex-col items-center justify-center p-24 font-sans">
@@ -91,7 +96,11 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
         </div>
 
         {/* Google Login */}
-        <button className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-3 text-white font-bold hover:bg-white/10 transition-all group">
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-3 text-white font-bold hover:bg-white/10 transition-all group"
+        >
           <img src="/google_logo.png" alt="Google" className="w-5 h-5" />
           <span className="text-sm">Continue with Google</span>
         </button>
@@ -99,7 +108,7 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
         {/* Create Account & Optional Skip */}
         <div className="mt-10 text-center space-y-4 relative z-10">
           <p className="text-gray-500 text-[18px]">
-            New to SKILLANEOUS? <button className="text-white font-bold underline decoration-cyan-500/50 underline-offset-4 hover:text-cyan-400 transition-colors">Create an account</button>
+            New to SKILLANEOUS? <a href="/signup" className="text-white font-bold underline decoration-cyan-500/50 underline-offset-4 hover:text-cyan-400 transition-colors">Create an account</a>
           </p>
           
           {/* Skip for now option */}

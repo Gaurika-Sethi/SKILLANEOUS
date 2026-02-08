@@ -42,7 +42,8 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create({ 
         username: username.toLowerCase(), 
         email, 
-        password 
+        password,
+        authProvider: "local",
     });
 
     const createdUser = await User.findById(user._id);
@@ -68,12 +69,16 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    if (!email  && !password) {
+    if (!email  || !password) {
         throw new ApiError(400, "Email and password are required.");
     }
 
     if(!user){
         throw new ApiError(404, "User not found.");
+    }
+
+    if (!user.password) {
+        throw new ApiError(400, "Use Google sign-in for this account.");
     }
 
     const isPasswordValid = await user.isPasswordCorrect(password);
@@ -110,6 +115,27 @@ const loginUser = asyncHandler(async (req, res) => {
     );
 
 })
+
+const googleAuthCallback = asyncHandler(async (req, res) => {
+    if (!req.user?._id) {
+        throw new ApiError(401, "Google authentication failed.");
+    }
+
+    const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(req.user._id);
+
+    const options = {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    };
+
+    const redirectUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
+    return res
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .redirect(redirectUrl + "/");
+});
 
 // logout user
 const logoutUser = asyncHandler(async (req, res) => {
@@ -284,5 +310,6 @@ export {
     refreshAccessToken,
     changePassword,
     getCurrentUser,
-    updateUserProfile
+    updateUserProfile,
+    googleAuthCallback
 };

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import { API_BASE_URL } from "@/lib/api";
 import { User, Mail, Lock, Eye, EyeOff, ShieldCheck, AlertCircle } from 'lucide-react';
 
 const CreateAccount = () => {
@@ -23,6 +24,10 @@ const CreateAccount = () => {
     setError("");
     console.log("Account created successfully!");
     // Add your API call logic here
+  };
+
+  const handleGoogleSignIn = () => {
+    window.location.href = `${API_BASE_URL}/api/v1/users/auth/google`;
   };
 
   return (
@@ -127,7 +132,11 @@ const CreateAccount = () => {
         </div>
 
         {/* Google Login */}
-        <button className="w-full flex items-center justify-center gap-5 bg-[#252529] border border-gray-700 py-3 rounded-xl hover:bg-[#2d2d33] transition-colors mb-6 mt-4">
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="w-full flex items-center justify-center gap-5 bg-[#252529] border border-gray-700 py-3 rounded-xl hover:bg-[#2d2d33] transition-colors mb-6 mt-4"
+        >
           <img src="/google_logo.png" className="w-5 h-5" alt="Google" />
           <span className="text-sm font-semibold text-white">Continue with Google</span>
         </button>
@@ -135,7 +144,7 @@ const CreateAccount = () => {
         {/* Footer Links */}
         <div className="text-center space-y-6">
           <p className="text-sm text-gray-400">
-            Already have an account? <a href="#" className="text-cyan-400 font-bold hover:underline underline-offset-4">Sign in</a>
+            Already have an account? <a href="/login" className="text-cyan-400 font-bold hover:underline underline-offset-4">Sign in</a>
           </p>
           
           <div className="flex items-center justify-center gap-2 text-[10px] text-gray-500 uppercase tracking-tighter">
