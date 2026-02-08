@@ -203,6 +203,31 @@ const response = await fetch(`${API}/api/v1/projects/${projectId}`);
       const raw = data?.data?.project || {};
       const newProjectId = data?.data?.projectId || projectData.projectId;
 
+      const regenRawChecklist =
+        raw.deploymentChecklist ??
+        raw.deployment_checklist ??
+        raw.deploymentSteps ??
+        raw.deployment_steps ??
+        raw.deploymentPlan;
+      const regenChecklistArray = Array.isArray(regenRawChecklist)
+        ? regenRawChecklist
+        : regenRawChecklist
+        ? String(regenRawChecklist)
+            .split(/\r?\n|•|-/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [];
+      const regenNormalizedChecklist = regenChecklistArray
+        .map((item: any) =>
+          typeof item === "string"
+            ? { title: item, subtitle: "" }
+            : {
+                title: item.title || item.step || item.name || item.text || "",
+                subtitle: item.subtitle || item.detail || item.notes || "",
+              }
+        )
+        .filter((item: any) => item.title);
+
       const normalized = {
         projectId: newProjectId,
         projectRequestId: requestIdForRegen,
@@ -217,9 +242,7 @@ const response = await fetch(`${API}/api/v1/projects/${projectId}`);
         folderStructure: Array.isArray(raw.folderStructure)
           ? raw.folderStructure.join("\n")
           : raw.folderStructure || projectData.folderStructure,
-        deploymentChecklist: (raw.deploymentChecklist || []).map((item: any) =>
-          typeof item === "string" ? { title: item, subtitle: "" } : item
-        ),
+        deploymentChecklist: regenNormalizedChecklist,
         resumeHighlights: raw.resumeBullets || raw.resumeHighlights || projectData.resumeHighlights || [],
         readmeContent: raw.githubReadmeTemplate || raw.readmeContent || projectData.readmeContent,
       };
