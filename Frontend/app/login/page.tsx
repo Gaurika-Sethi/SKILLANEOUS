@@ -1,11 +1,13 @@
 'use client';
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, ShieldCheck,} from 'lucide-react';
 type LoginPageProps = {
  onSkip?: () => void;
   onLogin?: (email: string, password: string) => void;
 };
 const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -99,12 +101,12 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
         {/* Create Account & Optional Skip */}
         <div className="mt-10 text-center space-y-4 relative z-10">
           <p className="text-gray-500 text-[18px]">
-            New to SKILLANEOUS? <button className="text-white font-bold underline decoration-cyan-500/50 underline-offset-4 hover:text-cyan-400 transition-colors">Create an account</button>
+            New to SKILLANEOUS? <button onClick={() => router.push('/signup')} className="text-white font-bold underline decoration-cyan-500/50 underline-offset-4 hover:text-cyan-400 transition-colors">Create an account</button>
           </p>
           
           {/* Skip for now option */}
           <button 
-            onClick={onSkip}
+            onClick={() => router.push('/how-it-works')}
             className="block w-full text-[16px] uppercase tracking-[0.3em] text-gray-600 hover:text-gray-400 transition-colors mt-6 pt-4 border-t border-white/5"
           >
             Skip for now
