@@ -18,7 +18,23 @@ const userSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function () {
+            return this.authProvider === "local";
+        },
+    },
+
+    authProvider: {
+        type: String,
+        enum: ["local", "google"],
+        default: "local",
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    avatarUrl: {
+        type: String,
     },
 
     refreshToken: {
@@ -39,7 +55,8 @@ const userSchema = new Schema({
 
 userSchema.pre("save", async function () {
     if (!this.isModified("password")) return;
-    
+    if (!this.password) return;
+
     this.password = await bcrypt.hash(this.password, 10);
 });
 

@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Mail, Lock, Eye, EyeOff, ShieldCheck, AlertCircle, Check, X, Image } from 'lucide-react';
+import { API_BASE_URL } from "@/lib/api";
 
 type SignUpPageProps = {
   onBackToLogin?: () => void;
@@ -25,6 +26,10 @@ const CreateAccountPage = ({ onBackToLogin, onSignUp }: SignUpPageProps) => {
     password: { isValid: false, rules: { minLength: false, hasNumber: false, hasSpecialChar: false } },
     email: { isValid: false }
   });
+
+  const handleGoogleSignIn = () => {
+    window.location.href = `${API_BASE_URL}/api/v1/users/auth/google`;
+  };
 
   // Username validation rules
   const validateUsername = (value: string) => {
@@ -343,7 +348,11 @@ const CreateAccountPage = ({ onBackToLogin, onSignUp }: SignUpPageProps) => {
         </div>
 
         {/* Google Login */}
-        <button className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-3 text-white font-bold hover:bg-white/10 transition-all group">
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 flex items-center justify-center gap-3 text-white font-bold hover:bg-white/10 transition-all group"
+        >
           <img src="/google_logo.png" alt="Google" className="w-5 h-5" />
           <span className="text-sm">Continue with Google</span>
         </button>
