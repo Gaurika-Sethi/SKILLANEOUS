@@ -1,5 +1,4 @@
-import CareerLanding from './src/homepage';
-
+import LoginPage from './login/page';
 export default function Home() {
-  return <CareerLanding />;
+  return <LoginPage/>;
 }
