@@ -30,7 +30,7 @@ export default function SkillaneousNavbar() {
         
         {/* --- LOGO & BRAND --- */}
         <a 
-          href="/" 
+          href="/home" 
           className="flex items-center gap-3 group transition-transform active:scale-95"
         >
           <div className="">
