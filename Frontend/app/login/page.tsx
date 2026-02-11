@@ -52,7 +52,11 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
           <div className="space-y-2">
             <div className="flex justify-between items-center px-1">
               <label className="text-s tracking-widest text-gray-400">Password</label>
-              <button type="button" className="text-s tracking-tighter text-cyan-400 hover:text-cyan-300 transition-colors">
+              <button 
+                type="button" 
+                onClick={() => router.push('/forgot-password')}
+                className="text-s tracking-tighter text-cyan-400 hover:text-cyan-300 transition-colors"
+              >
                 Forgot password?
               </button>
             </div>
