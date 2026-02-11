@@ -109,9 +109,9 @@ const generateRoadmap = asyncHandler(async (req, res) => {
       structured: structuredRoadmap,
       visibility: roadmapRequest.visibility,
       ai_metadata: {
-        provider: "openai",
-        model: "gpt-4o-mini",
-        temperature: 0.3,
+        provider: "groq",
+        model: "llama-3.1-8b-instant",
+        temperature: 0.2,
         prompt_version: "v2-json",
       },
     },

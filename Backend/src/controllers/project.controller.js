@@ -33,7 +33,7 @@ const generateProject = async (req, res) => {
       deploymentPreference: deploymentPreference || [],
     });
 
-    // 2) Generate using OpenAI
+    // 2) Generate using Groq
     const { generatedProject, ai_metadata } = await generateProjectWithAI({
       targetRole,
       skillLevel,
@@ -154,7 +154,7 @@ const regenerateProject = async (req, res) => {
     // 2) Delete existing generated project (replace strategy)
     await GeneratedProject.deleteOne({ projectRequestId: requestId });
 
-    // 3) Generate fresh output via OpenAI
+    // 3) Generate fresh output via Groq
     const { generatedProject, ai_metadata } = await generateProjectWithAI({
       targetRole: requestDoc.targetRole,
       skillLevel: requestDoc.skillLevel,

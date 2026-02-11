@@ -58,8 +58,8 @@ Return ONLY the JSON object.
 
   const aiRaw = await generateFromAI({
     prompt,
-    model: "gpt-4o-mini",
-    temperature: 0.3,
+    model: "llama-3.1-8b-instant",
+    temperature: 0.2,
     json: true, // ✅ if you implemented json mode in generateFromAI
   });
   console.log("🧠 AI RAW SUBTOPIC OUTPUT:\n", aiRaw);
