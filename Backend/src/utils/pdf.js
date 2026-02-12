@@ -1,13 +1,35 @@
-import puppeteer from "puppeteer-core";
+import puppeteerCore from "puppeteer-core";
 import chromium from "@sparticuz/chromium";
+import fs from "node:fs";
+
+const launchBrowser = async () => {
+  if (process.platform === "win32") {
+    const { default: puppeteer } = await import("puppeteer");
+    return puppeteer.launch({ headless: "new" });
+  }
+
+  let executablePath;
+  try {
+    executablePath = await chromium.executablePath();
+  } catch {
+    executablePath = undefined;
+  }
+
+  if (executablePath && fs.existsSync(executablePath)) {
+    return puppeteerCore.launch({
+      args: chromium.args,
+      executablePath,
+      headless: chromium.headless,
+      defaultViewport: chromium.defaultViewport,
+    });
+  }
+
+  const { default: puppeteer } = await import("puppeteer");
+  return puppeteer.launch({ headless: "new" });
+};
 
 const generatePdfFromHtml = async (html) => {
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-    defaultViewport: chromium.defaultViewport, 
-  });
+  const browser = await launchBrowser();
 
   try {
     const page = await browser.newPage();

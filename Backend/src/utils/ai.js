@@ -36,12 +36,15 @@ const generateFromAI = async ({
 
     return text;
   } catch (error) {
-    const status = error?.status;
+    const status = error?.status || error?.response?.status;
+    const message = error?.message || "";
 
-    if (status === 401) throw new ApiError(401, "Invalid Groq API key.");
+    if (status === 401 || /openai\s+api\s+key/i.test(message)) {
+      throw new ApiError(401, "Invalid Groq API key.");
+    }
     if (status === 429) throw new ApiError(429, "Groq rate limit exceeded.");
 
-    throw new ApiError(500, error?.message || "Failed to generate AI response.");
+    throw new ApiError(500, message || "Failed to generate AI response.");
   }
 };
 

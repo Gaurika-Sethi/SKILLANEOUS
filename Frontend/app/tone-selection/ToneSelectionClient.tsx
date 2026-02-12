@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 const TONES = [
   {
@@ -56,7 +57,7 @@ export default function ToneSelection() {
 
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/v1/resume/generate-ai`,
+      `${API_BASE_URL}/api/v1/resume/generate-ai`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
