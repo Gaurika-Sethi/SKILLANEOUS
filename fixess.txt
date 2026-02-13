@@ -1,0 +1,13 @@
+1. Resume- 
+add loading fuctionality on button
+if acheivements are optional then it should not appear in pdf if empty
+in pdf below name PORTFOLIO is coming with wrong link and not the one we are taking from user for also if i add teh label "link" and then the value for it it is stilll showing PORTFILIO with wrong link
+in project section the duration is not coming and also the link
+
+
+so right now my api key is exhausting too fast as too many calls are made on it so i want to add a credit system on this website ensuring that all users must make only limited number of request 
+
+solution: we will use credit system in which each user will have only 25 credits per 24 hrs and in every 24 hrs teh user will get 25 credits (note: even if the old credits are left there should not be any system of adding them up and saving for next day THE NUMBER SHOULD NOT EXCEED 25 STRICTLY)and the cost for generation is:
+roadmap- 10 credits
+resume- 2 credit
+project geneartion- 1 credit (also on clicking regenerate project it will cost 1 credit)
