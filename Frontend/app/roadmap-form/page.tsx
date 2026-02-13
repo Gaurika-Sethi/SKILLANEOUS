@@ -184,7 +184,19 @@ sessionStorage.setItem("roadmapRequestId", roadmapRequestId);
       <div className="max-w-4xl mx-auto space-y-10">
         <header>
           <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-5xl font-bold tracking-tight">Create Roadmap</h1>
+            <h1
+              className="pt-5 text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none"
+              style={{
+                backgroundImage:
+                  "linear-gradient(135deg, rgba(180, 180, 180, 1) 0%, rgba(255, 255, 255, 1) 45%, rgba(150, 150, 150, 1) 100%)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+                filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+              }}
+            >
+              Create Roadmap
+            </h1>
             <span className="bg-cyan-900/50 text-cyan-400 text-xs font-medium px-2.5 py-1 rounded-full border border-cyan-500/30">AI Powered</span>
           </div>
           <p className="text-gray-400 text-lg">Define your trajectory and bridge your skill gaps.</p>

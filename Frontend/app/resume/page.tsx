@@ -43,7 +43,19 @@ const ThemeSelection = () => {
         
         {/* Header Section */}
         <div className="text-center mb-16 space-y-4">
-          <h1 className="text-5xl font-bold tracking-tight">Choose Your Resume Theme</h1>
+          <h1
+            className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(135deg, rgba(180, 180, 180, 1) 0%, rgba(255, 255, 255, 1) 45%, rgba(150, 150, 150, 1) 100%)",
+              WebkitBackgroundClip: "text",
+              backgroundClip: "text",
+              color: "transparent",
+              filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))",
+            }}
+          >
+            Choose Your Resume Theme
+          </h1>
           <p className="text-gray-400 text-lg">
             Select a theme that best matches your career goals and target industry
           </p>
