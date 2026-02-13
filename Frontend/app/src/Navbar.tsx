@@ -17,6 +17,7 @@ export default function SkillaneousNavbar() {
     { name: "Create Roadmap", href: "/roadmap-form" },
     { name: "Project Suggestion", href: "/project-form" },
     { name: "Resume Generator", href: "/resume" },
+    { name: "ATS Score Check", href: "/ats-score-check" },
     { name: "About", href: "/about" },
   ];
 
@@ -59,7 +60,7 @@ export default function SkillaneousNavbar() {
             <a
               key={link.name}
               href={link.href}
-              className="px-5 py-2 text-[14px] font-black uppercase tracking-[0.15em] text-white/50 hover:text-cyan-400 transition-colors relative group"
+              className="px-5 py-2 text-[14px] font-black uppercase tracking-[0.1em] text-white/50 hover:text-cyan-400 transition-colors relative group"
             >
               {link.name}
               <span className="absolute bottom-0 left-1/2 w-0 h-px bg-cyan-500 transition-all duration-300 group-hover:w-1/2 group-hover:left-1/4" />
