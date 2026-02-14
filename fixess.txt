@@ -1,5 +1,4 @@
 1. Resume- 
-add loading fuctionality on button
 if acheivements are optional then it should not appear in pdf if empty
 in pdf below name PORTFOLIO is coming with wrong link and not the one we are taking from user for also if i add teh label "link" and then the value for it it is stilll showing PORTFILIO with wrong link
 in project section the duration is not coming and also the link
@@ -11,3 +10,4 @@ solution: we will use credit system in which each user will have only 25 credits
 roadmap- 10 credits
 resume- 2 credit
 project geneartion- 1 credit (also on clicking regenerate project it will cost 1 credit)
+In backend Gaurika must check that the link parsed goes assuming https:// if not entered by user but not when the user enters it. Also use AI to understand why Project link not working.
