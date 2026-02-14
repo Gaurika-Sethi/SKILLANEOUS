@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { API_BASE_URL } from "@/lib/api";
+import WritingAnimation from "./WritingAnimation";
 
 const TONES = [
   {
@@ -91,8 +92,19 @@ export default function ToneSelection() {
 };
 
   return (
-    <div className="min-h-screen bg-black text-white px-6 py-20 font-sans">
-      <div className="max-w-2xl mx-auto space-y-10">
+    <>
+      {/* Full-screen writing animation overlay */}
+      {isGenerating && (
+        <div className="fixed inset-0 bg-black z-50">
+          <WritingAnimation />
+        </div>
+      )}
+
+      {/* Original form */}
+      <div className={`min-h-screen bg-black text-white px-6 py-20 font-sans transition-opacity duration-300 ${
+        isGenerating ? "opacity-30 pointer-events-none" : "opacity-100"
+      }`}>
+        <div className="max-w-2xl mx-auto space-y-10">
         
         {/* Header Section */}
         <header className="text-center space-y-4">
@@ -199,7 +211,8 @@ export default function ToneSelection() {
           </div>
         </section>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
