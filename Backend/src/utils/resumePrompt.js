@@ -117,14 +117,15 @@ const buildResumeGenerationPrompt = ({
     "company": "",
     "startDate": "",
     "endDate": "",
-    "bullets": []
+    "description": []
     }
     ],
     "projects": [
     {
     "title": "",
     "techStack": [],
-    "bullets": [],
+    "duration": "",
+    "description": [],
     "links": [{ "type": "", "url": "" }]
     }
     ],
