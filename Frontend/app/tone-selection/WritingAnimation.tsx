@@ -133,7 +133,10 @@ export default function WritingAnimation() {
                     style={{
                       left: `${startX}%`,
                       top: `${startY}%`,
-                      animation: `float-away ${0.9 + Math.random() * 0.6}s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards`,
+                      animationName: "float-away",
+                      animationDuration: `${0.9 + Math.random() * 0.6}s`,
+                      animationTimingFunction: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                      animationFillMode: "forwards",
                       animationDelay: `${i * 0.04}s`,
                       boxShadow: "0 0 6px rgba(253, 224, 71, 0.5)",
                     }}
@@ -170,7 +173,10 @@ export default function WritingAnimation() {
                 key={i}
                 className="w-2.5 h-2.5 bg-gradient-to-b from-cyan-400 to-cyan-600 rounded-full shadow-lg shadow-cyan-500/50"
                 style={{
-                  animation: `bounce 1.4s ease-in-out infinite`,
+                  animationName: "bounce",
+                  animationDuration: "1.4s",
+                  animationTimingFunction: "ease-in-out",
+                  animationIterationCount: "infinite",
                   animationDelay: `${i * 0.15}s`,
                 }}
               />
