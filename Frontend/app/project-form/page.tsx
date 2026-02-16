@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState, KeyboardEvent, useMemo } from "react";
+import React, { useState, KeyboardEvent, useMemo, useEffect } from "react"; // Added useEffect
 import { useRouter } from "next/navigation";
 import { 
   Sparkles, Terminal, BookOpen, Settings2, ChevronRight, 
   X, Zap, Globe, Github, Layout, Clock, Server, Cpu, 
-  ShieldCheck, Lock, Loader 
+  ShieldCheck, Lock, Loader, Box, CheckCircle2, AlertTriangle
 } from "lucide-react";
 
 export default function ProjectGenerationForm() {
@@ -16,8 +16,8 @@ export default function ProjectGenerationForm() {
   const [learningObjective, setLearningObjective] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingStep, setLoadingStep] = useState(0); // For isometric build stages
 
-  
   // Tech Stack starts empty
   const [tags, setTags] = useState<string[]>([]); 
   
@@ -25,6 +25,18 @@ export default function ProjectGenerationForm() {
   const [outputPrefs, setOutputPrefs] = useState<string[]>([]);
   const [timeCommit, setTimeCommit] = useState("1-3hr");
   const [deployPrefs, setDeployPrefs] = useState<string[]>([]);
+
+  // Loading animation logic
+  useEffect(() => {
+    if (loading) {
+      const interval = setInterval(() => {
+        setLoadingStep((prev) => (prev + 1) % 5);
+      }, 1200);
+      return () => clearInterval(interval);
+    } else {
+      setLoadingStep(0);
+    }
+  }, [loading]);
 
   // --- RGBA COLOR MAP ---
   const colors = {
@@ -114,8 +126,6 @@ const handleSubmit = async () => {
     deploymentPreference: mapDeployPrefs(deployPrefs),
   };
 
-  console.log("✅ Submitting payload:", payload);
-
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/projects/generate`, {
       method: "POST",
@@ -123,44 +133,114 @@ const handleSubmit = async () => {
       body: JSON.stringify(payload),
     });
 
-    console.log("✅ Response status:", res.status);
-
     const data = await res.json();
-    console.log("✅ Response data:", data);
-
     if (!res.ok) throw new Error(data?.message || "Failed to generate project");
 
     const projectId = data?.data?.projectId;
     const requestId = data?.data?.requestId;
-    console.log("✅ Redirecting to project display with project ID:", projectId);
     
-    // Prefer projectId for fetching the generated project
-    router.push(`/project-display?id=${projectId || requestId}`);
+    setTimeout(() => {
+      router.push(`/project-display?id=${projectId || requestId}`);
+    }, 1500); // Small buffer to show "Assembly Complete"
   } catch (err: any) {
-    console.error("❌ API error:", err);
     setError(err.message || "Something went wrong");
     setLoading(false);
   }
 };
 
-const handleRegenerate = async (requestId: string) => {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/projects/${requestId}/regenerate`, {
-    method: "POST",
-  });
-
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.message || "Failed to regenerate");
-
-  return data;
-};
-
-
   return (
     <div 
-      className="min-h-screen px-6 py-16 font-sans selection:bg-indigo-500/30"
+      className="min-h-screen px-6 py-16 font-sans selection:bg-indigo-500/30 relative"
       style={{ backgroundColor: colors.bgMain, color: colors.white }}
     >
-      <div className="max-w-5xl mx-auto">
+      <style jsx global>{`
+        @keyframes isoFloat {
+          0%, 100% { transform: translateY(0px) rotateX(45deg) rotateZ(45deg); }
+          50% { transform: translateY(-20px) rotateX(45deg) rotateZ(45deg); }
+        }
+        @keyframes blockIn {
+          0% { transform: translate(100px, -100px); opacity: 0; }
+          100% { transform: translate(0, 0); opacity: 1; }
+        }
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-5px); }
+          75% { transform: translateX(5px); }
+        }
+        .iso-container {
+          perspective: 1000px;
+        }
+        .iso-box {
+          transform-style: preserve-3d;
+          animation: isoFloat 4s ease-in-out infinite;
+        }
+        .module-block {
+          animation: blockIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+      `}</style>
+
+      {/* --- ISOMETRIC LOADING OVERLAY --- */}
+      {loading && (
+        <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/95 backdrop-blur-2xl">
+          <div className="iso-container relative w-64 h-64 flex items-center justify-center">
+            {/* The Main Wireframe */}
+            <div className="iso-box relative w-32 h-32 border-2 border-white/10 flex items-center justify-center">
+              
+              {/* Module 1: Core Logic (Cyan) - Always there */}
+              <div className="absolute inset-2 bg-cyan-500/20 border border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] flex items-center justify-center">
+                <Settings2 size={24} className="text-cyan-400 -rotate-45" />
+              </div>
+
+              {/* Module 2: UI Layer (Purple) - Appears in step 1 */}
+              {loadingStep >= 1 && (
+                <div className="module-block absolute inset-0 -translate-y-full bg-purple-500/20 border border-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)] flex items-center justify-center">
+                  <Layout size={24} className="text-purple-400 -rotate-45" />
+                </div>
+              )}
+
+              {/* Module 3: Trial (Red) - Appears in step 2, then shakes and disappears */}
+              {loadingStep === 2 && (
+                <div className="animate-[shake_0.4s_infinite] absolute -right-16 -top-16 w-20 h-20 bg-red-500/20 border border-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center">
+                  <AlertTriangle size={24} className="text-red-500 -rotate-45" />
+                </div>
+              )}
+
+              {/* Module 4: Database (Green) - Final success module */}
+              {loadingStep >= 3 && (
+                <div className="module-block absolute -bottom-8 -right-8 w-24 h-24 bg-green-500/20 border border-green-400 shadow-[0_0_15px_rgba(34,197,94,0.3)] flex items-center justify-center">
+                  <Server size={24} className="text-green-400 -rotate-45" />
+                </div>
+              )}
+            </div>
+
+            {/* Grid Background Effect */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(99,102,241,0.1)_0%,transparent_70%)] pointer-events-none" />
+          </div>
+
+          <div className="mt-12 text-center space-y-4">
+            <h2 className="text-3xl font-black text-white tracking-widest uppercase italic">
+              Assembling <span className="text-indigo-400">Project</span>
+            </h2>
+            <div className="flex flex-col items-center gap-2">
+              <div className="flex gap-1">
+                {[0, 1, 2, 3].map((i) => (
+                  <div key={i} className={`h-1 w-8 rounded-full transition-all duration-500 ${loadingStep >= i ? 'bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.8)]' : 'bg-white/10'}`} />
+                ))}
+              </div>
+              <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.5em] mt-4">
+                {loadingStep === 0 && "Synthesizing requirements..."}
+                {loadingStep === 1 && "Building architectural blocks..."}
+                {loadingStep === 2 && "Validating dependencies..."}
+                {loadingStep === 3 && "Integrating tech stack..."}
+                {loadingStep === 4 && "Finalizing blueprint..."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- ORIGINAL FORM UI --- */}
+      <div className={`max-w-5xl mx-auto transition-all duration-700 ${loading ? 'opacity-0 scale-95 blur-xl' : 'opacity-100 scale-100 blur-0'}`}>
         
         {/* --- HEADER --- */}
         <header className="mb-16 space-y-4">
@@ -175,18 +255,13 @@ const handleRegenerate = async (requestId: string) => {
               <Terminal size={28} style={{ color: "rgba(129, 140, 248, 1)" }} />
             </div>
             
-            {/* UPDATED H1 WITH METALLIC GRADIENT TEXTURE */}
             <h1 
               className="text-4xl md:text-5xl font-black tracking-tighter uppercase leading-none"
               style={{
-                // Multi-stop linear gradient for metallic effect (gray -> white -> gray)
                 backgroundImage: "linear-gradient(135deg, rgba(180, 180, 180, 1) 0%, rgba(255, 255, 255, 1) 45%, rgba(150, 150, 150, 1) 100%)",
-                // Clip background to text
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
-                // Make text transparent so gradient shows through
                 color: "transparent",
-                // Slight drop shadow for depth
                 filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))"
               }}
             >
@@ -286,15 +361,6 @@ const handleRegenerate = async (requestId: string) => {
                   <SelectCard label="No Pref" icon={null} rgba="156, 163, 175" active={outputPrefs.includes('No pref')} onClick={() => toggleMulti('No pref', outputPrefs, setOutputPrefs)} />
                 </div>
               </div>
-
-                {/* <div className="space-y-4">
-                <label className="text-xs font-black uppercase tracking-widest" style={{ color: colors.textDim }}>Time Commitment <span style={{ color: colors.textWarn }}>*</span></label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <SelectCard label="<1 hr / day" sublabel="Light Pace" icon={<Clock size={20}/>} rgba="14, 165, 233" active={timeCommit === "<1 hr"} onClick={() => setTimeCommit("<1 hr")} />
-                  <SelectCard label="1-3 hrs / day" sublabel="Steady Progress" icon={<Clock size={20}/>} rgba="99, 102, 241" active={timeCommit === "1-3hr"} onClick={() => setTimeCommit("1-3hr")} />
-                  <SelectCard label="3+ hrs / day" sublabel="Deep Mastery" icon={<Clock size={20}/>} rgba="244, 63, 94" active={timeCommit === "3+ hrs"} onClick={() => setTimeCommit("3+ hrs")} />
-                </div>
-                </div> */}
 
               <div className="space-y-4">
                 <label className="text-xs font-black uppercase tracking-widest" style={{ color: colors.textDim }}>Deployment <span style={{ color: colors.textWarn }}>*</span></label>
