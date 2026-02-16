@@ -119,7 +119,7 @@ const LoginPage = ({ onSkip, onLogin }: LoginPageProps) => {
           
           {/* Skip for now option */}
           <button 
-            onClick={() => router.push('/how-it-works')}
+            onClick={() => router.push('/home')}
             className="block w-full text-[16px] uppercase tracking-[0.3em] text-gray-600 hover:text-gray-400 transition-colors mt-6 pt-4 border-t border-white/5"
           >
             Skip for now
