@@ -53,6 +53,14 @@ const generateResume = asyncHandler(async (req, res) => {
         const normalized = normalizeGeneratedResumeContent(aiResponse);
         normalized.personalInfo.photoUrl = resumeData?.personalInfo?.photoUrl || "";
         
+        // Preserve user's original link labels (don't let AI modify them)
+        if (resumeData?.personalInfo?.links && resumeData.personalInfo.links.length > 0) {
+            normalized.personalInfo.links = resumeData.personalInfo.links.map((l) => ({
+                label: l.label || "",
+                url: l.url || "",
+            }));
+        }
+        
         if (templateType === "creative"&& !normalized.personalInfo.photoUrl) {
             throw new ApiError(400, "Photo is required for the creative template.");
         }
