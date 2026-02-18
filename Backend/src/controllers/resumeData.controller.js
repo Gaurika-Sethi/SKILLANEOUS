@@ -3,6 +3,7 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { normalizeLinkEntries } from "../utils/url.js";
 
 // Submit resume data
 const createResumeData = asyncHandler(async (req, res) => {
@@ -23,6 +24,7 @@ const createResumeData = asyncHandler(async (req, res) => {
     }
 
     const personalInfo = req.body.personalInfo ? JSON.parse(req.body.personalInfo) : {};
+    personalInfo.links = normalizeLinkEntries(personalInfo?.links || []);
     personalInfo.photoUrl = photoUrl || "";
 
     const parsedSkills = req.body.parsedSkills ? JSON.parse(req.body.parsedSkills) : [];

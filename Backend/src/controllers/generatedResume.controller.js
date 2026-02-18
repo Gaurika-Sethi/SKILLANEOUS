@@ -9,6 +9,7 @@ import { safeJsonParse } from "../utils/json.js";
 import { normalizeGeneratedResumeContent } from "../utils/normalizeGeneratedResume.js";
 import { renderResumeHtml } from "../utils/resumeTemplate.js";
 import { generatePdfFromHtml } from "../utils/pdf.js";
+import { normalizeLinkEntries } from "../utils/url.js";
 
 const generateResume = asyncHandler(async (req, res) => {
         console.log("🟢 generateResume controller entered");
@@ -55,10 +56,7 @@ const generateResume = asyncHandler(async (req, res) => {
         
         // Preserve user's original link labels (don't let AI modify them)
         if (resumeData?.personalInfo?.links && resumeData.personalInfo.links.length > 0) {
-            normalized.personalInfo.links = resumeData.personalInfo.links.map((l) => ({
-                label: l.label || "",
-                url: l.url || "",
-            }));
+            normalized.personalInfo.links = normalizeLinkEntries(resumeData.personalInfo.links);
         }
         
         if (templateType === "creative"&& !normalized.personalInfo.photoUrl) {
