@@ -22,4 +22,13 @@ const normalizeLinkEntries = (links = []) => {
     }));
 };
 
-export { normalizeHttpUrl, normalizeLinkEntries };
+const normalizeProjectLinkEntries = (links = []) => {
+    if (!Array.isArray(links)) return [];
+
+    return links.map((link) => ({
+        type: link?.type || "other",
+        url: normalizeHttpUrl(link?.url || ""),
+    }));
+};
+
+export { normalizeHttpUrl, normalizeLinkEntries, normalizeProjectLinkEntries };

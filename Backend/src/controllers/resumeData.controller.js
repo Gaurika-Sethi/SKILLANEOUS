@@ -3,7 +3,7 @@ import { uploadToCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { normalizeLinkEntries } from "../utils/url.js";
+import { normalizeLinkEntries, normalizeProjectLinkEntries } from "../utils/url.js";
 
 // Submit resume data
 const createResumeData = asyncHandler(async (req, res) => {
@@ -30,6 +30,12 @@ const createResumeData = asyncHandler(async (req, res) => {
     const parsedSkills = req.body.parsedSkills ? JSON.parse(req.body.parsedSkills) : [];
     const experience = req.body.experience ? JSON.parse(req.body.experience) : [];
     const projects = req.body.projects ? JSON.parse(req.body.projects) : [];
+    const normalizedProjects = Array.isArray(projects)
+        ? projects.map((project) => ({
+            ...project,
+            links: normalizeProjectLinkEntries(project?.links || []),
+        }))
+        : [];
     const education = req.body.education ? JSON.parse(req.body.education) : {};
     const achievements = req.body.achievements ? JSON.parse(req.body.achievements) : [];
 
@@ -39,7 +45,7 @@ const createResumeData = asyncHandler(async (req, res) => {
         summary: req.body.summary || "",
         parsedSkills,
         experience,
-        projects,
+        projects: normalizedProjects,
         education,
         achievements,
     })

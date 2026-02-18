@@ -109,7 +109,11 @@
                 <div class="flex justify-between items-baseline mb-1">
                     <h4 class="text-sm font-bold text-slate-900">
                         {{this.title}}
+                        {{#if this.links.[0].url}}
+                        <a href="{{this.links.[0].url}}" target="_blank" rel="noopener noreferrer" class="text-slate-400 font-normal no-underline">🔗</a>
+                        {{else}}
                         <span class="text-slate-400 font-normal">🔗</span>
+                        {{/if}}
                     </h4>
                     <span class="text-xs font-bold text-slate-500 uppercase italic">
                         {{this.duration}}

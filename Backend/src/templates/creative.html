@@ -126,7 +126,7 @@
                 {{#each projects}}
                 <div class="mb-6">
                     <div class="flex justify-between items-baseline mb-1">
-                        <h4 class="text-sm font-bold text-slate-800">1) {{this.title}} 🔗</h4>
+                        <h4 class="text-sm font-bold text-slate-800">1) {{this.title}} {{#if this.links.[0].url}}<a href="{{this.links.[0].url}}" target="_blank" rel="noopener noreferrer" class="no-underline">🔗</a>{{else}}🔗{{/if}}</h4>
                         <span class="text-xs text-slate-400 font-medium italic">{{this.duration}}</span>
                     </div>
                     <p class="text-[10px] font-mono text-slate-400 mb-2">{{join this.tech_stack " | "}}</p>
