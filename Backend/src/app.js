@@ -37,6 +37,9 @@ app.use('/api/v1/roadmap', roadmapRoutes);
 import projectRoutes from './routes/project.routes.js';
 app.use("/api/v1/projects", projectRoutes);
 
+import atsRoutes from "./routes/ats.routes.js";
+app.use("/api/v1/ats", atsRoutes);
+
 app.use((err, req, res, next) => {
     const statusCode = err.statusCode || 500;
     console.error("🔥 GLOBAL ERROR HANDLER:", err);
