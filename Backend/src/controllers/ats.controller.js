@@ -1,4 +1,6 @@
 import { extractResumeText } from "../utils/pdfExtractor.js";
+import { generateATSParameters } from "../utils/groqClient.js";
+import { evaluateResume } from "../utils/groqClient.js";
 
 const analyzeResume = async (req, res) => {
  try {
@@ -32,4 +34,59 @@ const analyzeResume = async (req, res) => {
  }
 };
 
-export { analyzeResume };
+const generateParameters = async (req, res) => {
+ try {
+
+  const { targetRole, jobDescription } = req.body;
+
+  if (!targetRole || !jobDescription) {
+   return res.status(400).json({
+    message: "targetRole and jobDescription are required"
+   });
+  }
+
+  const parameters = await generateATSParameters(
+   targetRole,
+   jobDescription
+  );
+
+  return res.status(200).json(parameters);
+
+ } catch (error) {
+  return res.status(500).json({
+   message: "Failed to generate ATS parameters",
+   error: error.message
+  });
+ }
+};
+
+const evaluateResumeController = async (req, res) => {
+ try {
+
+  if (!req.body) {
+   return res.status(400).json({
+    message: "Request body is missing"
+   });
+  }
+
+  const { resumeText, parameters } = req.body;
+
+  if (!resumeText || !parameters) {
+   return res.status(400).json({
+    message: "resumeText and parameters are required"
+   });
+  }
+
+  const evaluation = await evaluateResume(resumeText, parameters);
+
+  return res.status(200).json(evaluation);
+
+ } catch (error) {
+  return res.status(500).json({
+   message: "Resume evaluation failed",
+   error: error.message
+  });
+ }
+};
+
+export { analyzeResume, generateParameters, evaluateResumeController };
