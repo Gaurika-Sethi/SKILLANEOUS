@@ -1,6 +1,6 @@
 import { extractResumeText } from "../utils/pdfExtractor.js";
 
-export const analyzeResume = async (req, res) => {
+const analyzeResume = async (req, res) => {
  try {
   const { targetRole, jobDescription } = req.body;
 
@@ -16,16 +16,20 @@ export const analyzeResume = async (req, res) => {
    });
   }
 
+  // Extract text from PDF
   const resumeText = await extractResumeText(req.file.buffer);
 
-  res.status(200).json({
+  // Temporary response for Step 1
+  return res.status(200).json({
    text: resumeText
   });
 
  } catch (error) {
-  res.status(500).json({
-   message: "Resume parsing failed",
+  return res.status(500).json({
+   message: "Resume analysis failed",
    error: error.message
   });
  }
 };
+
+export { analyzeResume };
