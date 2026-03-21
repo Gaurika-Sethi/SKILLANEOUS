@@ -27,15 +27,19 @@ const analyzeResume = async (req, res) => {
 
   // Return only required fields (your Phase-0 spec)
   return res.status(200).json({
-   atsScore: result.atsScore,
-   missingKeywords: result.missingKeywords,
-   suggestions: result.suggestions
-  });
+    success: true,
+    data: {
+        atsScore: result.atsScore,
+        missingKeywords: result.missingKeywords,
+        suggestions: result.suggestions
+    }
+});
 
  } catch (error) {
   return res.status(500).json({
-   message: "ATS analysis failed",
-   error: error.message
+    success: false,
+    message: "ATS analysis failed",
+    error: error.message
   });
  }
 };

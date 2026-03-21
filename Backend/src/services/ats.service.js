@@ -4,24 +4,47 @@ import {
  evaluateResume
 } from "../utils/groqClient.js";
 
-const runATSAnalysis = async (fileBuffer, targetRole, jobDescription) => {
+const runATSAnalysis = async (
+ fileBuffer,
+ targetRole,
+ jobDescription
+) => {
 
- // Step 1 — Extract resume text
- const resumeText = await extractResumeText(fileBuffer);
+ try {
 
- // Step 2 — Generate ATS parameters
- const parameters = await generateATSParameters(
-  targetRole,
-  jobDescription
- );
+  // Step 1 — Extract resume text
+  const resumeText = await extractResumeText(fileBuffer);
 
- // Step 3 — Evaluate resume
- const evaluation = await evaluateResume(
-  resumeText,
-  parameters
- );
+  if (!resumeText || resumeText.trim().length === 0) {
+   throw new Error("Failed to extract text from resume");
+  }
 
- return evaluation;
+  // Step 2 — Generate evaluation parameters
+  const parameters = await generateATSParameters(
+   targetRole,
+   jobDescription
+  );
+
+  if (!parameters) {
+   throw new Error("Failed to generate ATS parameters");
+  }
+
+  // Step 3 — Evaluate resume
+  const evaluation = await evaluateResume(
+   resumeText,
+   parameters
+  );
+
+  if (!evaluation) {
+   throw new Error("Failed to evaluate resume");
+  }
+
+  // Step 4 — Return final ATS result
+  return evaluation;
+
+ } catch (error) {
+  throw new Error(`ATS Service Error: ${error.message}`);
+ }
 };
 
 export { runATSAnalysis };
