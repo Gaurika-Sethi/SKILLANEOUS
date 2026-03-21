@@ -1,14 +1,28 @@
 import express from "express";
-import { analyzeResume } from "../controllers/ats.controller.js";
+import {
+ analyzeResume,
+ generateParameters,
+ evaluateResumeController
+} from "../controllers/ats.controller.js";
+
 import { uploadResume } from "../middlewares/uploadResume.middleware.js";
-import { generateParameters } from "../controllers/ats.controller.js";
-import { evaluateResumeController } from "../controllers/ats.controller.js";
 
 const router = express.Router();
 
-// POST /ats/ats-analyze
-router.post("/ats-analyze", uploadResume.single("resume"), analyzeResume);
-router.post("/generate-parameters", generateParameters);
-router.post("/evaluate-resume", evaluateResumeController);
+// 🔥 FINAL ATS PIPELINE
+// POST /api/ats/analyze
+router.post(
+ "/analyze",
+ uploadResume.single("resume"),
+ analyzeResume
+);
+
+// 🧪 STEP 2 TESTING (AI parameter generation)
+// POST /api/ats/parameters
+router.post("/parameters", generateParameters);
+
+// 🧪 STEP 3 TESTING (AI evaluation only)
+// POST /api/ats/evaluate
+router.post("/evaluate", evaluateResumeController);
 
 export default router;

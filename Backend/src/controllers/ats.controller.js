@@ -1,7 +1,7 @@
-import { extractResumeText } from "../utils/pdfExtractor.js";
-import { generateATSParameters } from "../utils/groqClient.js";
-import { evaluateResume } from "../utils/groqClient.js";
+import { generateATSParameters, evaluateResume } from "../utils/groqClient.js";
+import { runATSAnalysis } from "../services/ats.service.js";
 
+// FINAL ATS PIPELINE CONTROLLER
 const analyzeResume = async (req, res) => {
  try {
   const { targetRole, jobDescription } = req.body;
@@ -18,25 +18,33 @@ const analyzeResume = async (req, res) => {
    });
   }
 
-  // Extract text from PDF
-  const resumeText = await extractResumeText(req.file.buffer);
+  // 🔥 Call service (clean architecture)
+  const result = await runATSAnalysis(
+   req.file.buffer,
+   targetRole,
+   jobDescription
+  );
 
-  // Temporary response for Step 1
+  // Return only required fields (your Phase-0 spec)
   return res.status(200).json({
-   text: resumeText
+   atsScore: result.atsScore,
+   missingKeywords: result.missingKeywords,
+   suggestions: result.suggestions
   });
 
  } catch (error) {
   return res.status(500).json({
-   message: "Resume analysis failed",
+   message: "ATS analysis failed",
    error: error.message
   });
  }
 };
 
+
+
+// STEP 2 TESTING CONTROLLER (keep for debugging)
 const generateParameters = async (req, res) => {
  try {
-
   const { targetRole, jobDescription } = req.body;
 
   if (!targetRole || !jobDescription) {
@@ -60,14 +68,11 @@ const generateParameters = async (req, res) => {
  }
 };
 
+
+
+// STEP 3 TESTING CONTROLLER (keep for debugging)
 const evaluateResumeController = async (req, res) => {
  try {
-
-  if (!req.body) {
-   return res.status(400).json({
-    message: "Request body is missing"
-   });
-  }
 
   const { resumeText, parameters } = req.body;
 
@@ -89,4 +94,8 @@ const evaluateResumeController = async (req, res) => {
  }
 };
 
-export { analyzeResume, generateParameters, evaluateResumeController };
+export {
+ analyzeResume,
+ generateParameters,
+ evaluateResumeController
+};
