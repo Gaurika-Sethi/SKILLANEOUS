@@ -9,6 +9,10 @@ console.log("ENV CHECK:", {
 });
 
 connectDB()
+.catch((error) => {
+    console.log("Error in connecting to the database", error);
+    return null;
+})
 .then(() => {
     app.on("error", (error) => {
         console.log("Error in starting the server", error);
@@ -19,7 +23,4 @@ connectDB()
         console.log(`Server is running on port ${process.env.PORT}`);
     });
 })
-.catch((error) => {
-    console.log("Error in connecting to the database", error);
-    process.exit(1);
-});
+;
