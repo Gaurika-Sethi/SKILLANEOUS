@@ -4,21 +4,27 @@ const groq = new Groq({
  apiKey: process.env.GROQ_API_KEY
 });
 
+
+// 🔥 STEP 2 — GENERATE KEYWORDS (STRICT + CLEAN)
 const generateATSParameters = async (targetRole, jobDescription) => {
 
  const prompt = `
-You are an ATS resume evaluation system.
+You are an ATS system.
 
-From the given job title and job description, extract the important evaluation parameters used to judge resumes.
+Extract ONLY relevant technical skills from the job title and description.
 
-Return ONLY valid JSON.
+Return ONLY valid JSON:
 
-Fields required:
-requiredSkills
-optionalSkills
-importantSections
-keywords
-bulletPointGuidelines
+{
+ "requiredSkills": [],
+ "optionalSkills": []
+}
+
+Rules:
+- Include ONLY technical/domain-specific skills
+- Avoid soft skills unless explicitly required
+- Keep skills concise (1–3 words)
+- Do NOT include explanations or markdown
 
 Job Title:
 ${targetRole}
@@ -29,56 +35,56 @@ ${jobDescription}
 
  const response = await groq.chat.completions.create({
   model: "llama-3.3-70b-versatile",
-  messages: [
-   {
-    role: "user",
-    content: prompt
-   }
-  ],
+  messages: [{ role: "user", content: prompt }],
   temperature: 0.2
  });
 
  const text = response.choices[0].message.content;
 
- const cleaned = text
-  .replace(/```json/g, "")
-  .replace(/```/g, "")
-  .trim();
-  
-  return JSON.parse(cleaned);
+ // safer parsing
+ const jsonMatch = text.match(/\{[\s\S]*\}/);
+
+ if (!jsonMatch) {
+  throw new Error("Failed to parse ATS parameters");
+ }
+
+ return JSON.parse(jsonMatch[0]);
 };
 
-const evaluateResume = async (resumeText, parameters) => {
+
+
+// 🔥 STEP 5 — GENERATE SUGGESTIONS ONLY (NO SCORING HERE)
+const generateSuggestions = async (
+ resumeText,
+ missingKeywords,
+ targetRole
+) => {
 
  const prompt = `
-You are an ATS (Applicant Tracking System).
+You are an ATS assistant.
 
-Evaluate the resume based on the given evaluation parameters.
-
-Parameters:
-${JSON.stringify(parameters)}
+The following keywords are missing from the resume:
+${missingKeywords.join(", ")}
 
 Resume:
 ${resumeText}
 
-Return ONLY valid JSON with the following fields:
+Instructions:
+- Give specific suggestions to improve the resume
+- Focus ONLY on missing keywords
+- DO NOT suggest skills already present
+- Be concise and actionable
 
-atsScore (0-100)
-missingKeywords
-suggestions
-bulletPointImprovements
+Return ONLY JSON:
 
-Do not include markdown or explanations.
+{
+ "suggestions": []
+}
 `;
 
  const response = await groq.chat.completions.create({
   model: "llama-3.3-70b-versatile",
-  messages: [
-   {
-    role: "user",
-    content: prompt
-   }
-  ],
+  messages: [{ role: "user", content: prompt }],
   temperature: 0.2
  });
 
@@ -87,10 +93,14 @@ Do not include markdown or explanations.
  const jsonMatch = text.match(/\{[\s\S]*\}/);
 
  if (!jsonMatch) {
-  throw new Error("AI response did not contain JSON");
+  throw new Error("Failed to parse suggestions");
  }
 
  return JSON.parse(jsonMatch[0]);
 };
 
-export { generateATSParameters, evaluateResume };
+
+export {
+ generateATSParameters,
+ generateSuggestions
+};

@@ -1,8 +1,7 @@
 import express from "express";
 import {
  analyzeResume,
- generateParameters,
- evaluateResumeController
+ generateParameters
 } from "../controllers/ats.controller.js";
 
 import { uploadResume } from "../middlewares/uploadResume.middleware.js";
@@ -20,9 +19,5 @@ router.post(
 // 🧪 STEP 2 TESTING (AI parameter generation)
 // POST /api/ats/parameters
 router.post("/parameters", generateParameters);
-
-// 🧪 STEP 3 TESTING (AI evaluation only)
-// POST /api/ats/evaluate
-router.post("/evaluate", evaluateResumeController);
 
 export default router;
