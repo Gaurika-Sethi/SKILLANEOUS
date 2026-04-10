@@ -1,10 +1,8 @@
 import { extractResumeText } from "../utils/pdfExtractor.js";
 import {
  generateATSParameters,
- generateSuggestions
+ evaluateResumeATS
 } from "../utils/groqClient.js";
-
-import { matchKeywords } from "../utils/keywordMatcher.js";
 
 import {
  getCacheKey,
@@ -48,46 +46,36 @@ const runATSAnalysis = async (
    return fallbackAnalysis(resumeText, jobDescription);
   }
 
-  // STEP 3 — Keyword matching (CORE LOGIC)
-  const { matchedKeywords, missingKeywords } = matchKeywords(
-   resumeText,
-   parameters
-  );
+// STEP 3 — AI Evaluation (NEW CORE LOGIC)
+let atsResult;
 
-  // STEP 4 — Score calculation (DETERMINISTIC)
-  const totalSkills =
-   (parameters.requiredSkills?.length || 0) +
-   (parameters.optionalSkills?.length || 0);
+try {
+ atsResult = await evaluateResumeATS(resumeText, parameters);
+} catch (err) {
+ console.log("⚠️ AI evaluation failed, using fallback");
+ return fallbackAnalysis(resumeText, jobDescription);
+}
 
-  const atsScore =
-   totalSkills === 0
-    ? 50
-    : Math.round(
-        ((totalSkills - missingKeywords.length) / totalSkills) * 100
-      );
+// STEP 4 — Safe Final Response
 
-  // STEP 5 — AI suggestions (ONLY for improvements)
-  let suggestions = [];
+let finalScore = Number(atsResult.score);
 
-  try {
-   const aiResponse = await generateSuggestions(
-    resumeText,
-    missingKeywords,
-    targetRole
-   );
+if (isNaN(finalScore)) finalScore = 50;
+finalScore = Math.max(0, Math.min(100, finalScore));
 
-   suggestions = aiResponse.suggestions || [];
-  } catch (err) {
-   console.log("⚠️ Suggestion generation failed");
-   suggestions = ["Improve alignment with job description"];
-  }
+const missingKeywords = Array.isArray(atsResult.missing_required_skills)
+  ? atsResult.missing_required_skills
+  : [];
 
-  // STEP 6 — Final response
-  return {
-   atsScore,
-   missingKeywords,
-   suggestions
-  };
+const suggestions = Array.isArray(atsResult.suggestions)
+  ? atsResult.suggestions
+  : ["Improve alignment with job description"];
+
+return {
+  atsScore: finalScore,
+  missingKeywords,
+  suggestions
+};
 
  } catch (error) {
   throw new Error(`ATS Service Error: ${error.message}`);
