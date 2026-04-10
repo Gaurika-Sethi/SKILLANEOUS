@@ -5,9 +5,12 @@ import {
 } from "../utils/groqClient.js";
 
 import {
- getCacheKey,
- getCachedParameters,
- setCachedParameters
+  getCacheKey,
+  getCachedParameters,
+  setCachedParameters,
+  getEvaluationCacheKey,
+  getCachedEvaluation,
+  setCachedEvaluation
 } from "../utils/atsCache.js";
 
 import { fallbackAnalysis } from "../utils/fallbackAnalyzer.js";
@@ -46,6 +49,19 @@ const runATSAnalysis = async (
    return fallbackAnalysis(resumeText, jobDescription);
   }
 
+  // 🔥 NEW — Check evaluation cache
+const evalCacheKey = getEvaluationCacheKey(
+  resumeText,
+  targetRole,
+  jobDescription
+);
+
+const cachedEvaluation = getCachedEvaluation(evalCacheKey);
+
+if (cachedEvaluation) {
+  return cachedEvaluation;
+}
+
 // STEP 3 — AI Evaluation (NEW CORE LOGIC)
 let atsResult;
 
@@ -71,11 +87,26 @@ const suggestions = Array.isArray(atsResult.suggestions)
   ? atsResult.suggestions
   : ["Improve alignment with job description"];
 
-return {
+const strengths = Array.isArray(atsResult.strengths)
+  ? atsResult.strengths
+  : [];
+
+const weaknesses = Array.isArray(atsResult.weaknesses)
+  ? atsResult.weaknesses
+  : [];
+
+const finalResponse = {
   atsScore: finalScore,
   missingKeywords,
-  suggestions
+  suggestions,
+  strengths,
+  weaknesses
 };
+
+// 🔥 NEW — Save to cache
+setCachedEvaluation(evalCacheKey, finalResponse);
+
+return finalResponse;
 
  } catch (error) {
   throw new Error(`ATS Service Error: ${error.message}`);

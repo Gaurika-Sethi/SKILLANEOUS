@@ -29,6 +29,8 @@ const analyzeResume = async (req, res) => {
     data: {
       atsScore: result.atsScore,
       missingKeywords: result.missingKeywords,
+      strengths: result.strengths,
+      weaknesses: result.weaknesses,
       suggestions: result.suggestions
     }
   });
