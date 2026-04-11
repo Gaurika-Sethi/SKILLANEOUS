@@ -105,6 +105,13 @@ const evaluateResumeATS = async (resumeText, parameters) => {
   const prompt = `
 You are a strict ATS (Applicant Tracking System).
 
+STRICT EVALUATION REQUIREMENTS:
+
+- ALWAYS identify at least 1-2 missing or improvable areas, even for strong resumes
+- If no required skills are missing, analyze depth of experience and list weaknesses
+- Suggestions MUST NOT be empty
+- Avoid overly perfect evaluations
+
 Your task is to evaluate a resume against job requirements.
 
 INPUT:
