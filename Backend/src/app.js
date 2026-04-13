@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import "./config/passport.js";
-import { connectRedis } from "./src/config/redisClient.js";
+import { connectRedis } from "./config/redisClient.js";
 
 connectRedis();
 

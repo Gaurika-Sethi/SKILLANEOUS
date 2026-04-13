@@ -103,16 +103,11 @@ const evaluateResumeATS = async (resumeText, parameters) => {
   const { requiredSkills = [], optionalSkills = [] } = parameters;
 
   const prompt = `
-You are a strict ATS (Applicant Tracking System).
+You are an ATS (Applicant Tracking System).
 
-STRICT EVALUATION REQUIREMENTS:
+Your job is to evaluate a resume realistically and fairly.
 
-- ALWAYS identify at least 1-2 missing or improvable areas, even for strong resumes
-- If no required skills are missing, analyze depth of experience and list weaknesses
-- Suggestions MUST NOT be empty
-- Avoid overly perfect evaluations
-
-Your task is to evaluate a resume against job requirements.
+-----------------------------------
 
 INPUT:
 
@@ -125,31 +120,66 @@ ${optionalSkills.join(", ")}
 Resume:
 ${resumeText.slice(0, 2000)}
 
----
+-----------------------------------
 
-EVALUATION RULES:
+EVALUATION BEHAVIOR:
 
-1. Be STRICT — do not assume skills without evidence
-2. Consider closely related technologies:
-   - Express.js → Node.js
-   - REST API → Backend Development
-3. Required skills are more important than optional skills
-4. Penalize missing required skills heavily
-5. Only count a skill if clearly demonstrated
+- Be realistic, not overly harsh
+- Evaluate overall profile, not just keyword presence
+- Consider projects, experience, and practical exposure
+- Allow strong profiles to compensate for minor missing skills
+- Do NOT give overly perfect evaluations
 
----
+-----------------------------------
 
-SCORING SYSTEM:
+SKILL MATCHING RULES:
 
-- Required Skills: 60%
+- Only count a skill if there is clear evidence
+- Accept closely related technologies:
+  - Express.js → Node.js
+  - REST APIs → Backend Development
+- Do NOT assume skills without evidence
+
+-----------------------------------
+
+MISSING SKILLS RULE:
+
+- Only include important missing skills
+- Do NOT list trivial or loosely related skills
+- Maximum 3-5 missing skills
+
+-----------------------------------
+
+SCORING LOGIC:
+
+- Required Skills: 50%
 - Optional Skills: 20%
-- Experience/Projects relevance: 20%
+- Experience/Projects: 30%
 
-Score must be an integer between 0 and 100
+SCORING GUIDELINES:
 
----
+- Missing 1-2 required skills → small penalty
+- Missing many required skills → larger penalty
+- Strong projects/experience → increase score
+- Weak or irrelevant experience → reduce score
 
-OUTPUT FORMAT (STRICT JSON ONLY):
+Score Ranges:
+- 75-85 → strong match
+- 60-74 → moderate match
+- 40-59 → weak match
+- below 40 → poor match
+
+-----------------------------------
+
+OUTPUT REQUIREMENTS:
+
+- ALWAYS include at least 1 weakness
+- ALWAYS include at least 1 suggestion
+- Suggestions must be based ONLY on missing skills or weaknesses
+
+-----------------------------------
+
+RETURN STRICT JSON ONLY:
 
 {
   "score": number,
@@ -161,13 +191,6 @@ OUTPUT FORMAT (STRICT JSON ONLY):
   "weaknesses": [],
   "suggestions": []
 }
-
----
-
-STRICT RULES:
-- Suggestions MUST be based only on missing skills or weak areas
-- DO NOT add skills not present in required/optional lists
-- DO NOT include explanations outside JSON
 `;
 
   const response = await groq.chat.completions.create({
