@@ -33,12 +33,12 @@ const runATSAnalysis = async (
   // STEP 2 — Generate or fetch cached parameters
   const cacheKey = getCacheKey(targetRole, jobDescription);
 
-  let parameters = getCachedParameters(cacheKey);
+  let parameters = await getCachedParameters(cacheKey);
 
   if (!parameters) {
    try {
     parameters = await generateATSParameters(targetRole, jobDescription);
-    setCachedParameters(cacheKey, parameters);
+    await setCachedParameters(cacheKey, parameters);
    } catch (err) {
     console.log("⚠️ Parameter generation failed");
    }
@@ -56,7 +56,7 @@ const evalCacheKey = getEvaluationCacheKey(
   jobDescription
 );
 
-const cachedEvaluation = getCachedEvaluation(evalCacheKey);
+const cachedEvaluation = await getCachedEvaluation(evalCacheKey);
 
 if (cachedEvaluation) {
   return cachedEvaluation;
@@ -104,7 +104,7 @@ const finalResponse = {
 };
 
 // 🔥 NEW — Save to cache
-setCachedEvaluation(evalCacheKey, finalResponse);
+await setCachedEvaluation(evalCacheKey, finalResponse);
 
 return finalResponse;
 

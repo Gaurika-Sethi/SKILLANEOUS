@@ -3,6 +3,7 @@
     "prettier": "^3.7.4"
   },
   "dependencies": {
-    "groq-sdk": "^0.37.0"
+    "groq-sdk": "^0.37.0",
+    "redis": "^5.11.0"
   }
 }

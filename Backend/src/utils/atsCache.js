@@ -1,32 +1,38 @@
-const parameterCache = new Map();
+import { redisClient } from "../config/redisClient.js";
+import crypto from "crypto";
 
+// 🔹 Parameter Cache
 const getCacheKey = (targetRole, jobDescription) => {
- return `${targetRole.toLowerCase()}::${jobDescription.toLowerCase()}`;
+  return `params:${targetRole.toLowerCase()}::${jobDescription.toLowerCase()}`;
 };
 
-const getCachedParameters = (key) => {
- return parameterCache.get(key);
+const getCachedParameters = async (key) => {
+  const data = await redisClient.get(key);
+  return data ? JSON.parse(data) : null;
 };
 
-const setCachedParameters = (key, value) => {
- parameterCache.set(key, value);
+const setCachedParameters = async (key, value) => {
+  await redisClient.set(key, JSON.stringify(value), {
+    EX: 60 * 60 // 1 hour expiry
+  });
 };
 
-// 🔥 NEW: Evaluation Cache (resume + job)
-
-const evaluationCache = new Map();
-
+// 🔹 Evaluation Cache
 const getEvaluationCacheKey = (resumeText, targetRole, jobDescription) => {
-  const shortResume = resumeText.slice(0, 1000); // avoid huge keys
-  return `${targetRole.toLowerCase()}::${jobDescription.toLowerCase()}::${shortResume.toLowerCase()}`;
+  return `eval:${targetRole.toLowerCase()}::${jobDescription.toLowerCase()}::${
+    crypto.createHash("sha256").update(resumeText).digest("hex")
+  }`;
 };
 
-const getCachedEvaluation = (key) => {
-  return evaluationCache.get(key);
+const getCachedEvaluation = async (key) => {
+  const data = await redisClient.get(key);
+  return data ? JSON.parse(data) : null;
 };
 
-const setCachedEvaluation = (key, value) => {
-  evaluationCache.set(key, value);
+const setCachedEvaluation = async (key, value) => {
+  await redisClient.set(key, JSON.stringify(value), {
+    EX: 60 * 60 // 1 hour expiry
+  });
 };
 
 export {
