@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ArrowLeft,
+  ArrowRight,
   ChevronDown,
   ChevronUp,
   Lightbulb,
@@ -19,50 +20,50 @@ type ATSAnalysisResult = {
 };
 
 const getScoreTheme = (score: number) => {
-  if (score < 50) {
+  if (score >= 75) {
     return {
-      accent: '#ef4444',
-      accentSoft: 'rgba(239, 68, 68, 0.22)',
-      accentGlow: 'rgba(239, 68, 68, 0.52)',
-      label: 'Poor Compatibility',
-      gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+      accent: '#12ca49',
+      accentSoft: 'rgba(34, 255, 136, 0.24)',
+      accentGlow: 'rgba(34, 255, 137, 0.24)',
+      label: 'Strong Match',
+      gradient: 'linear-gradient(135deg, #40d35b 0%, #13b75d 55%, #06d466 100%)',
       description:
-        'Your profile currently misses several role-defining signals. Focus on adding direct keyword matches and stronger, measurable outcomes to raise compatibility quickly.',
+        'Your resume aligns well with the role and is likely to pass ATS screening effectively. A few targeted refinements can push this even higher.',
     };
   }
 
-  if (score < 75) {
+  if (score >= 60) {
+    return {
+      accent: '#cae11f',
+      accentSoft: 'rgba(202, 225, 31, 0.20)',
+      accentGlow: 'rgba(202, 225, 31, 0.34)',
+      label: 'Moderate Match',
+      gradient: 'linear-gradient(135deg, #d9f99d 0%, #facc15 100%)',
+      description:
+        'Your profile shows potential but still misses important role-specific signals. Improve keyword alignment and specificity to increase compatibility.',
+    };
+  }
+
+  if (score >= 40) {
     return {
       accent: '#f97316',
       accentSoft: 'rgba(249, 115, 22, 0.20)',
-      accentGlow: 'rgba(249, 115, 22, 0.38)',
-      label: 'Improvement Required',
-      gradient: 'linear-gradient(135deg, #ff7411 0%, #ef4c3a 100%)',
+      accentGlow: 'rgba(249, 115, 22, 0.36)',
+      label: 'Weak Match',
+      gradient: 'linear-gradient(135deg, #f49f01 0%, #f15602 100%)',
       description:
-        'You have a decent baseline, but keyword coverage and phrasing still need refinement. Tightening section content should noticeably improve ATS matching.',
-    };
-  }
-
-  if (score < 85) {
-    return {
-      accent: '#a3e635',
-      accentSoft: 'rgba(163, 230, 53, 0.20)',
-      accentGlow: 'rgba(163, 230, 53, 0.34)',
-      label: 'Acceptable Compatibility',
-      gradient: 'linear-gradient(135deg, #a9f222 0%, #7bea1a 100%)',
-      description:
-        'Your resume aligns well with the target role and should clear many ATS filters. A few strategic edits can move this into an elite match range.',
+        'Your current resume has limited overlap with job requirements. Focus on core skills, role language, and measurable achievements to improve results.',
     };
   }
 
   return {
-    accent: '#16db41',
-    accentSoft: 'rgba(26, 228, 66, 0.2)',
-    accentGlow: 'rgba(48, 220, 14, 0.39)',
-    label: 'Excellent Compatibility',
-    gradient: 'linear-gradient(135deg, #1fdd42 0%, #0bce2e 40% ,#07bb28 100%)',
+    accent: '#ef4444',
+    accentSoft: 'rgba(239, 68, 68, 0.22)',
+    accentGlow: 'rgba(239, 68, 68, 0.52)',
+    label: 'Poor Match',
+    gradient: 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
     description:
-      'Excellent alignment with the job profile. Your resume is highly ATS-friendly and already communicates strong relevance for this role.',
+      'The resume currently has low compatibility with the target role. Substantial improvements are needed in structure, skills alignment, and role-specific wording.',
   };
 };
 
@@ -253,11 +254,24 @@ const ATSResultsPage = () => {
                     )}
                   </div>
                 </AccordionPanel>
+
               </div>
             </div>
           </section>
         </div>
       </div>
+
+      <button
+        type="button"
+        onClick={() => router.push('/resume')}
+        aria-label="Update resume"
+        className="floating-update-btn fixed bottom-5 right-4 z-30 inline-flex items-center gap-2 rounded-2xl border border-violet-200/20 bg-[linear-gradient(145deg,rgba(48,41,74,0.96),rgba(86,43,86,0.92)_38%,rgba(97,44,120,0.92)_68%,rgba(64,53,113,0.96))] px-4 py-3 text-[13px] font-black uppercase tracking-[0.14em] text-violet-100 shadow-[0_12px_24px_rgba(88,55,130,0.42),inset_0_1px_1px_rgba(255,255,255,0.12)] transition hover:shadow-[0_16px_30px_rgba(121,76,172,0.48),inset_0_1px_1px_rgba(255,255,255,0.18)] active:translate-y-[1px] md:bottom-7 md:right-7 md:px-5 md:py-3.5"
+      >
+        Update Resume
+        <span className="rounded-full bg-white/12 p-1.5 text-violet-100 border border-white/10">
+          <ArrowRight size={14} />
+        </span>
+      </button>
 
       <style jsx global>{`
         @keyframes slow-drift {
@@ -272,6 +286,20 @@ const ATSResultsPage = () => {
 
         .drift {
           animation: slow-drift 10s ease-in-out infinite;
+        }
+
+        @keyframes cta-float {
+          0%,
+          100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-4px);
+          }
+        }
+
+        .floating-update-btn {
+          animation: cta-float 3.2s ease-in-out infinite;
         }
       `}</style>
     </div>

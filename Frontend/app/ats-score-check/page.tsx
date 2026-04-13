@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../../lib/api';
 import {
   Upload,
   FileText,
-  Building,
+  Target,
   ShieldCheck,
   ArrowRight,
   FileCheck,
@@ -23,8 +23,8 @@ const ATSCheckerPage = () => {
   const router = useRouter();
   const [file, setFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
-  const [company, setCompany] = useState('');
-  const [isTouched, setIsTouched] = useState({ file: false, jd: false });
+  const [targetRole, setTargetRole] = useState('');
+  const [isTouched, setIsTouched] = useState({ file: false, jd: false, role: false });
   const [uploadStatus, setUploadStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [isScanning, setIsScanning] = useState(false);
   const [scanProgress, setScanProgress] = useState(0);
@@ -39,7 +39,11 @@ const ATSCheckerPage = () => {
 
   const isFileValid = !!file;
   const isJdValid = jobDescription.trim().length > 20;
-  const isFormValid = isFileValid && isJdValid;
+  const isRoleValid = targetRole.trim().length >= 2;
+  const isFormValid = isFileValid && isJdValid && isRoleValid;
+  const showFileWarning = isTouched.file && !isFileValid;
+  const showRoleWarning = isTouched.role && !isRoleValid;
+  const showJdWarning = isTouched.jd && !isJdValid;
 
   useEffect(() => {
     return () => {
@@ -73,10 +77,9 @@ const ATSCheckerPage = () => {
       return;
     }
 
-    const targetRole = company.trim() || jobDescription.trim().split(/\r?\n/).find(Boolean) || 'Target role';
     const formData = new FormData();
     formData.append('resume', file);
-    formData.append('targetRole', targetRole);
+    formData.append('targetRole', targetRole.trim());
     formData.append('jobDescription', jobDescription);
 
     const response = await fetch(`${API_BASE_URL}/api/v1/ats/analyze`, {
@@ -167,14 +170,14 @@ const ATSCheckerPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#07070a] flex flex-col items-center justify-center p-6 md:p-12 font-sans text-gray-200 overflow-hidden relative">
+    <div className="min-h-screen bg-[#07070a] flex flex-col items-center justify-center px-5 pt-24 pb-12 md:px-8 md:pt-28 md:pb-16 font-sans text-gray-200 overflow-hidden relative">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute -top-24 left-1/4 h-72 w-72 rounded-full bg-cyan-500/10 blur-[120px]" />
         <div className="absolute top-1/3 -right-24 h-80 w-80 rounded-full bg-fuchsia-500/10 blur-[120px]" />
         <div className="absolute -bottom-28 left-1/3 h-80 w-80 rounded-full bg-emerald-500/10 blur-[120px]" />
       </div>
 
-      <div className="w-full max-w-[760px] rounded-[36px] border border-white/10 bg-white/[0.04] shadow-[0_0_40px_rgba(14,165,233,0.12)] backdrop-blur-xl relative overflow-hidden min-h-[640px] flex flex-col justify-center p-8 md:p-12">
+      <div className="w-full max-w-[760px] mx-1 md:mx-2 rounded-[36px] border border-white/10 bg-white/[0.04] shadow-[0_0_40px_rgba(14,165,233,0.12)] backdrop-blur-xl relative overflow-hidden min-h-[640px] flex flex-col justify-center p-8 md:p-12">
         {!isScanning ? (
           <div className="animate-in fade-in duration-500 relative z-10">
             <div className="text-center mb-12">
@@ -205,7 +208,7 @@ const ATSCheckerPage = () => {
                 <div
                   onClick={() => fileInputRef.current?.click()}
                   className={`relative group cursor-pointer border-2 border-dashed rounded-[24px] p-8 transition-all duration-300 flex flex-col items-center justify-center gap-4 ${
-                    !isFileValid && isTouched.file
+                    showFileWarning
                       ? 'border-rose-500/50 bg-rose-500/5'
                       : 'border-white/10 hover:border-cyan-500/40 bg-white/5'
                   }`}
@@ -230,9 +233,42 @@ const ATSCheckerPage = () => {
                   </div>
                   <div className="text-center">
                     <p className="text-sm font-bold text-white">{file ? file.name : 'Choose PDF or DOCX'}</p>
-                    {uploadStatus === 'error' && <p className="text-xs text-rose-400 mt-1">Invalid file format</p>}
+                    {uploadStatus === 'error' && isTouched.file && <p className="text-xs text-rose-400 mt-1">Invalid file format</p>}
                   </div>
                 </div>
+                {showFileWarning && (
+                  <p className="text-xs text-rose-400 ml-1">
+                    {uploadStatus === 'error'
+                      ? 'Please upload only PDF or DOCX files.'
+                      : 'Please upload your resume to continue.'}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-[11px] font-bold tracking-[0.22em] text-gray-400 uppercase ml-1">
+                  Target Role *
+                </label>
+                <div className="relative group">
+                  <Target className={`absolute left-4 top-1/2 -translate-y-1/2 ${showRoleWarning ? 'text-rose-400' : 'text-gray-500 group-focus-within:text-cyan-300'}`} size={18} />
+                  <input
+                    type="text"
+                    placeholder="e.g. Frontend Developer"
+                    className={`w-full rounded-2xl border bg-[#0b0b10] py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none transition-all ${
+                      showRoleWarning
+                        ? 'border-rose-500/50 focus:ring-1 focus:ring-rose-500/20'
+                        : 'border-white/10 focus:border-cyan-500/50'
+                    }`}
+                    value={targetRole}
+                    onBlur={() => setIsTouched((previous) => ({ ...previous, role: true }))}
+                    onChange={(e) => setTargetRole(e.target.value)}
+                  />
+                </div>
+                {showRoleWarning && (
+                  <p className="text-xs text-rose-400 ml-1">
+                    Please enter a valid target role (at least 2 characters).
+                  </p>
+                )}
               </div>
 
               <div className="space-y-3">
@@ -241,14 +277,14 @@ const ATSCheckerPage = () => {
                 </label>
                 <div className="relative group">
                   <FileText
-                    className={`absolute left-4 top-5 ${!isJdValid && isTouched.jd ? 'text-rose-400' : 'text-gray-500 group-focus-within:text-cyan-300'}`}
+                    className={`absolute left-4 top-5 ${showJdWarning ? 'text-rose-400' : 'text-gray-500 group-focus-within:text-cyan-300'}`}
                     size={18}
                   />
                   <textarea
                     rows={4}
                     placeholder="Paste the job description here..."
                     className={`w-full rounded-2xl border bg-[#0b0b10] py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none transition-all resize-none ${
-                      !isJdValid && isTouched.jd
+                      showJdWarning
                         ? 'border-rose-500/50 focus:ring-1 focus:ring-rose-500/20'
                         : 'border-white/10 focus:border-cyan-500/50'
                     }`}
@@ -257,26 +293,15 @@ const ATSCheckerPage = () => {
                     onChange={(e) => setJobDescription(e.target.value)}
                   />
                 </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-[11px] font-bold tracking-[0.22em] text-gray-400 uppercase ml-1">
-                  Target Company (Optional)
-                </label>
-                <div className="relative group">
-                  <Building className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-cyan-300" size={18} />
-                  <input
-                    type="text"
-                    placeholder="e.g. Google"
-                    className="w-full rounded-2xl border border-white/10 bg-[#0b0b10] py-4 pl-12 pr-4 text-white placeholder:text-gray-600 focus:outline-none focus:border-cyan-500/50 transition-all"
-                    value={company}
-                    onChange={(e) => setCompany(e.target.value)}
-                  />
-                </div>
+                {showJdWarning && (
+                  <p className="text-xs text-rose-400 ml-1">
+                    Job description is too short. Add at least 20 characters for meaningful ATS matching.
+                  </p>
+                )}
               </div>
 
               <div className="pt-4">
-                <div className={`p-[2px] rounded-2xl transition-all duration-300 ${isFormValid ? 'bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-500 hover:scale-[1.015]' : 'bg-white/10 opacity-50'}`}>
+                <div className={`p-[2px] rounded-2xl transition-all duration-300 ${isFormValid ? 'bg-gradient-to-r from-cyan-400 via-sky-400 to-fuchsia-500 hover:scale-[1.015] shadow-[0_0_30px_rgba(34,211,238,0.2)]' : 'bg-white/10 opacity-50'}`}>
                   <button
                     disabled={!isFormValid}
                     onClick={handleStartScan}
