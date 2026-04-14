@@ -200,7 +200,7 @@ RETURN STRICT JSON ONLY:
   });
 
   const text = response.choices[0].message.content;
-
+ 
   const jsonMatch = text.match(/\{[\s\S]*\}/);
 
   if (!jsonMatch) {

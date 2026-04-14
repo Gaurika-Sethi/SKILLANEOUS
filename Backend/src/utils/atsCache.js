@@ -1,4 +1,4 @@
-import { redisClient } from "../config/redisClient.js";
+import { redisClient, redisAvailable } from "../config/redisClient.js";
 import crypto from "crypto";
 
 // 🔹 Parameter Cache
@@ -7,14 +7,27 @@ const getCacheKey = (targetRole, jobDescription) => {
 };
 
 const getCachedParameters = async (key) => {
-  const data = await redisClient.get(key);
-  return data ? JSON.parse(data) : null;
+  if (!redisAvailable) return null;
+
+  try {
+    const data = await redisClient.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.log("Cache read failed");
+    return null;
+  }
 };
 
 const setCachedParameters = async (key, value) => {
-  await redisClient.set(key, JSON.stringify(value), {
-    EX: 60 * 60 // 1 hour expiry
-  });
+  if (!redisAvailable) return;
+
+  try {
+    await redisClient.set(key, JSON.stringify(value), {
+      EX: 60 * 60
+    });
+  } catch (err) {
+    console.log("Cache write failed");
+  }
 };
 
 // 🔹 Evaluation Cache
@@ -25,15 +38,29 @@ const getEvaluationCacheKey = (resumeText, targetRole, jobDescription) => {
 };
 
 const getCachedEvaluation = async (key) => {
-  const data = await redisClient.get(key);
-  return data ? JSON.parse(data) : null;
+  if (!redisAvailable) return null;
+
+  try {
+    const data = await redisClient.get(key);
+    return data ? JSON.parse(data) : null;
+  } catch (err) {
+    console.log("Cache read failed");
+    return null;
+  }
 };
 
 const setCachedEvaluation = async (key, value) => {
-  await redisClient.set(key, JSON.stringify(value), {
-    EX: 60 * 60 // 1 hour expiry
-  });
+  if (!redisAvailable) return;
+
+  try {
+    await redisClient.set(key, JSON.stringify(value), {
+      EX: 60 * 60
+    });
+  } catch (err) {
+    console.log("Cache write failed");
+  }
 };
+
 
 export {
   getCacheKey,
