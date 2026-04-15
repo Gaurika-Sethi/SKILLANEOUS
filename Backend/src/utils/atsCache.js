@@ -1,4 +1,4 @@
-import { redisClient, redisAvailable } from "../config/redisClient.js";
+import { safeRedis } from "../config/redisClient.js";
 import crypto from "crypto";
 
 // 🔹 Parameter Cache
@@ -7,10 +7,8 @@ const getCacheKey = (targetRole, jobDescription) => {
 };
 
 const getCachedParameters = async (key) => {
-  if (!redisAvailable) return null;
-
   try {
-    const data = await redisClient.get(key);
+    const data = await safeRedis.get(key);
     return data ? JSON.parse(data) : null;
   } catch (err) {
     console.log("Cache read failed");
@@ -19,12 +17,9 @@ const getCachedParameters = async (key) => {
 };
 
 const setCachedParameters = async (key, value) => {
-  if (!redisAvailable) return;
-
   try {
-    await redisClient.set(key, JSON.stringify(value), {
-      EX: 60 * 60
-    });
+    await safeRedis.set(key, value, {
+  EX: 60 * 60});
   } catch (err) {
     console.log("Cache write failed");
   }
@@ -38,29 +33,24 @@ const getEvaluationCacheKey = (resumeText, targetRole, jobDescription) => {
 };
 
 const getCachedEvaluation = async (key) => {
-  if (!redisAvailable) return null;
-
   try {
-    const data = await redisClient.get(key);
+    const data = await safeRedis.get(key);
     return data ? JSON.parse(data) : null;
   } catch (err) {
-    console.log("Cache read failed");
+    console.log("Cache read failed:", err.message);
     return null;
   }
 };
 
 const setCachedEvaluation = async (key, value) => {
-  if (!redisAvailable) return;
-
   try {
-    await redisClient.set(key, JSON.stringify(value), {
+    await safeRedis.set(key, value, {
       EX: 60 * 60
     });
   } catch (err) {
     console.log("Cache write failed");
   }
 };
-
 
 export {
   getCacheKey,

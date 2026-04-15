@@ -35,10 +35,18 @@ const runATSAnalysis = async (
 
   let parameters = await getCachedParameters(cacheKey);
 
+  if (parameters) {
+    console.log("⚡ Parameter cache hit");
+  }
+
   if (!parameters) {
    try {
     parameters = await generateATSParameters(targetRole, jobDescription);
-    await setCachedParameters(cacheKey, parameters);
+
+    if (parameters) {
+      await setCachedParameters(cacheKey, parameters);
+    }
+
    } catch (err) {
     console.log("⚠️ Parameter generation failed");
    }
@@ -49,64 +57,69 @@ const runATSAnalysis = async (
    return fallbackAnalysis(resumeText, jobDescription);
   }
 
-  // 🔥 NEW — Check evaluation cache
-const evalCacheKey = getEvaluationCacheKey(
-  resumeText,
-  targetRole,
-  jobDescription
-);
+  // 🔥 STEP 3 — Evaluation Cache Check
+  const evalCacheKey = getEvaluationCacheKey(
+    resumeText,
+    targetRole,
+    jobDescription
+  );
 
-const cachedEvaluation = await getCachedEvaluation(evalCacheKey);
+  const cachedEvaluation = await getCachedEvaluation(evalCacheKey);
 
-if (cachedEvaluation) {
-  return cachedEvaluation;
-}
+  if (cachedEvaluation) {
+    console.log("⚡ Evaluation cache hit");
+    return cachedEvaluation;
+  }
 
-// STEP 3 — AI Evaluation (NEW CORE LOGIC)
-let atsResult;
+  // STEP 4 — AI Evaluation
+  let atsResult;
 
-try {
- atsResult = await evaluateResumeATS(resumeText, parameters);
-} catch (err) {
- console.log("⚠️ AI evaluation failed, using fallback");
- return fallbackAnalysis(resumeText, jobDescription);
-}
+  try {
+    atsResult = await evaluateResumeATS(resumeText, parameters);
+  } catch (err) {
+    console.log("⚠️ AI evaluation failed, using fallback");
+    return fallbackAnalysis(resumeText, jobDescription);
+  }
 
-// STEP 4 — Safe Final Response
+  // STEP 5 — Safe Final Response
 
-let finalScore = Number(atsResult.score);
+  let finalScore = Number(atsResult.score);
 
-if (isNaN(finalScore)) finalScore = 50;
-finalScore = Math.max(0, Math.min(100, finalScore));
+  if (isNaN(finalScore)) finalScore = 50;
+  finalScore = Math.max(0, Math.min(100, finalScore));
 
-const missingKeywords = Array.isArray(atsResult.missing_required_skills)
-  ? atsResult.missing_required_skills
-  : [];
+  const missingKeywords = Array.isArray(atsResult.missing_required_skills)
+    ? atsResult.missing_required_skills
+    : [];
 
-const suggestions = Array.isArray(atsResult.suggestions)
-  ? atsResult.suggestions
-  : ["Improve alignment with job description"];
+  const suggestions = Array.isArray(atsResult.suggestions)
+    ? atsResult.suggestions
+    : ["Improve alignment with job description"];
 
-const strengths = Array.isArray(atsResult.strengths)
-  ? atsResult.strengths
-  : [];
+  const strengths = Array.isArray(atsResult.strengths)
+    ? atsResult.strengths
+    : [];
 
-const weaknesses = Array.isArray(atsResult.weaknesses)
-  ? atsResult.weaknesses
-  : [];
+  const weaknesses = Array.isArray(atsResult.weaknesses)
+    ? atsResult.weaknesses
+    : [];
 
-const finalResponse = {
-  atsScore: finalScore,
-  missingKeywords,
-  suggestions,
-  strengths,
-  weaknesses
-};
+  const finalResponse = {
+    atsScore: finalScore,
+    missingKeywords,
+    suggestions,
+    strengths,
+    weaknesses
+  };
 
-// 🔥 NEW — Save to cache
-await setCachedEvaluation(evalCacheKey, finalResponse);
+  // 🔥 STEP 6 — Cache result (only if valid)
+  try {
+    await setCachedEvaluation(evalCacheKey, finalResponse);
+  } catch (err) {
+    console.log("Cache write skipped");
+  }
 
-return finalResponse;
+  return finalResponse;
 
  } catch (error) {
   throw new Error(`ATS Service Error: ${error.message}`);
